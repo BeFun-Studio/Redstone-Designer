@@ -38,3 +38,6 @@
 *.iobj
 *.res
 *.def
+*.log
+*.tlog
+*.idb
