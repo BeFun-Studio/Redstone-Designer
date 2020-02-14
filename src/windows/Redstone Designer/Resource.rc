@@ -1,0 +1,153 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "winres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// 中文(简体，中国) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
+LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
+#pragma code_page(936)
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""winres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_LOGO                ICON                    "logo.ico"
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_MENU MENU
+BEGIN
+    POPUP "File(&F)"
+    BEGIN
+        POPUP "New(&N)"
+        BEGIN
+            MENUITEM "Circuit File(&C)...",         ID_NEW_CIRCUITFILE
+            MENUITEM "Project(&P)...",              ID_NEW_PROJECT
+        END
+        MENUITEM "Open(&O)...",                 ID_FILE_OPEN
+        MENUITEM "Import(I)...",                ID_FILE_IMPORT
+    END
+    POPUP "Edit(&E)"
+    BEGIN
+        MENUITEM "Copy(&C)",                    ID_EDIT_COPY
+        MENUITEM "Cut(&X)",                     ID_EDIT_CUT
+        MENUITEM "Paste(&V)",                   ID_EDIT_PASTE
+        MENUITEM "Undo(&Z)",                    ID_EDIT_UNDO
+        MENUITEM "Redo(&Y)",                    ID_EDIT_REDO
+        MENUITEM "Select(&S)",                  ID_EDIT_SELECT
+        MENUITEM "Select All(&A)",              ID_EDIT_SELECTALL
+        MENUITEM "Unselect(&U)",                ID_EDIT_UNSELECT
+        MENUITEM "Unselect All(&I)",            ID_EDIT_UNSELECTALL
+        MENUITEM "Move(&M)",                    ID_EDIT_MOVE
+    END
+    POPUP "View(&V)"
+    BEGIN
+        MENUITEM "Move(&M)",                    ID_VIEW_MOVE
+        MENUITEM "Move To(T)...",               ID_VIEW_MOVETO
+    END
+    POPUP "Place(&P)"
+    BEGIN
+        MENUITEM "Redstone Components(&R)",     ID_PLACE_REDSTONE
+        MENUITEM "Block(&B)",                   ID_PLACE_BLOCK
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,0
+ PRODUCTVERSION 1,0,0,0
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x40004L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "000004b0"
+        BEGIN
+            VALUE "CompanyName", "CodesBuilder"
+            VALUE "FileDescription", "Minecraft Redstone Designer"
+            VALUE "FileVersion", "1.0.0.0"
+            VALUE "InternalName", "Redstone Designer.exe"
+            VALUE "LegalCopyright", "Copyright (C) 2020 CodesBuilder"
+            VALUE "OriginalFilename", "Redstone Designer.exe"
+            VALUE "ProductName", "Redstone Designer"
+            VALUE "ProductVersion", "1.0.0.0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x0, 1200
+    END
+END
+
+#endif    // 中文(简体，中国) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

@@ -1,0 +1,16 @@
+﻿  main.cpp
+E:\源代码\Redstone-Designer\src\windows\Redstone Designer\circuit.hpp(70,20): warning C4018: “<”: 有符号/无符号不匹配
+E:\源代码\Redstone-Designer\src\windows\Redstone Designer\circuit.hpp(139,21): warning C4018: “<”: 有符号/无符号不匹配
+E:\源代码\Redstone-Designer\src\windows\Redstone Designer\circuit.hpp(174,21): warning C4018: “<”: 有符号/无符号不匹配
+E:\源代码\Redstone-Designer\src\windows\Redstone Designer\circuit.hpp(409,21): warning C4018: “<”: 有符号/无符号不匹配
+E:\源代码\Redstone-Designer\src\windows\Redstone Designer\circuit.hpp(422,21): warning C4018: “<”: 有符号/无符号不匹配
+E:\源代码\Redstone-Designer\src\windows\Redstone Designer\circuit.hpp(435,21): warning C4018: “<”: 有符号/无符号不匹配
+E:\源代码\Redstone-Designer\src\windows\Redstone Designer\circuit.hpp(452,21): warning C4018: “<”: 有符号/无符号不匹配
+E:\源代码\Redstone-Designer\src\windows\Redstone Designer\circuit.hpp(483,21): warning C4018: “<”: 有符号/无符号不匹配
+E:\源代码\Redstone-Designer\src\windows\Redstone Designer\circuit.hpp(499,21): warning C4018: “<”: 有符号/无符号不匹配
+E:\源代码\Redstone-Designer\src\windows\Redstone Designer\main_window.hpp(80,21): warning C4018: “<”: 有符号/无符号不匹配
+E:\源代码\Redstone-Designer\src\windows\Redstone Designer\main_window.hpp(82,21): warning C4018: “<”: 有符号/无符号不匹配
+E:\源代码\Redstone-Designer\src\windows\Redstone Designer\main_window.hpp(91,22): warning C4018: “<”: 有符号/无符号不匹配
+E:\源代码\Redstone-Designer\src\windows\Redstone Designer\main_window.hpp(54,12): warning C4101: “filename”: 未引用的局部变量
+E:\源代码\Redstone-Designer\src\windows\Redstone Designer\main_window.hpp(227,46): error C2440: “=”: 无法从“LRESULT (__cdecl *)(HWND,UINT,WPARAM,LPARAM)”转换为“WNDPROC”
+E:\源代码\Redstone-Designer\src\windows\Redstone Designer\main_window.hpp(227,32): message : 该强制转换要求 reinterpret_cast、C 样式强制转换或函数类型强制转换

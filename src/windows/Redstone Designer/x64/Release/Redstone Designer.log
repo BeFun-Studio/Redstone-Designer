@@ -1,0 +1,62 @@
+﻿  main.cpp
+E:\源代码\Redstone-Designer\src\windows\Redstone Designer\api.hpp(57,55): warning C4267: “参数”: 从“size_t”转换到“int”，可能丢失数据
+E:\源代码\Redstone-Designer\src\windows\Redstone Designer\main_window.hpp(198,174): warning C4244: “参数”: 从“LONG”转换到“FLOAT”，可能丢失数据
+E:\源代码\Redstone-Designer\src\windows\Redstone Designer\main_window.hpp(198,156): warning C4244: “参数”: 从“LONG”转换到“FLOAT”，可能丢失数据
+E:\源代码\Redstone-Designer\src\windows\Redstone Designer\main_window.hpp(198,140): warning C4244: “参数”: 从“LONG”转换到“FLOAT”，可能丢失数据
+E:\源代码\Redstone-Designer\src\windows\Redstone Designer\main_window.hpp(198,123): warning C4244: “参数”: 从“LONG”转换到“FLOAT”，可能丢失数据
+E:\源代码\Redstone-Designer\src\windows\Redstone Designer\main_window.hpp(198,254): warning C4267: “参数”: 从“size_t”转换到“UINT32”，可能丢失数据
+E:\源代码\Redstone-Designer\src\windows\Redstone Designer\main_window.hpp(199,208): warning C4244: “参数”: 从“LONG”转换到“FLOAT”，可能丢失数据
+E:\源代码\Redstone-Designer\src\windows\Redstone Designer\main_window.hpp(199,189): warning C4244: “参数”: 从“LONG”转换到“FLOAT”，可能丢失数据
+E:\源代码\Redstone-Designer\src\windows\Redstone Designer\main_window.hpp(199,172): warning C4244: “参数”: 从“LONG”转换到“FLOAT”，可能丢失数据
+E:\源代码\Redstone-Designer\src\windows\Redstone Designer\main_window.hpp(199,154): warning C4244: “参数”: 从“LONG”转换到“FLOAT”，可能丢失数据
+E:\源代码\Redstone-Designer\src\windows\Redstone Designer\main_window.hpp(199,288): warning C4267: “参数”: 从“size_t”转换到“UINT32”，可能丢失数据
+E:\源代码\Redstone-Designer\src\windows\Redstone Designer\main_window.hpp(54,12): warning C4101: “filename”: 未引用的局部变量
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.18362.0\um\d2d1helper.h(152,50): warning C4838: 从“Type”转换到“FLOAT”需要收缩转换
+          with
+          [
+              Type=LONG
+          ]
+E:\源代码\Redstone-Designer\src\windows\Redstone Designer\main_window.hpp(194): message : 查看对正在编译的函数 模板 实例化“D2D1::TypeTraits<LONG>::Rect D2D1::Rect<LONG>(Type,Type,Type,Type)”的引用
+          with
+          [
+              Type=LONG
+          ]
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.18362.0\um\d2d1helper.h(152,50): warning C4244: “初始化”: 从“Type”转换到“FLOAT”，可能丢失数据
+          with
+          [
+              Type=LONG
+          ]
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.18362.0\um\d2d1helper.h(152,56): warning C4838: 从“Type”转换到“FLOAT”需要收缩转换
+          with
+          [
+              Type=LONG
+          ]
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.18362.0\um\d2d1helper.h(152,56): warning C4244: “初始化”: 从“Type”转换到“FLOAT”，可能丢失数据
+          with
+          [
+              Type=LONG
+          ]
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.18362.0\um\d2d1helper.h(152,61): warning C4838: 从“Type”转换到“FLOAT”需要收缩转换
+          with
+          [
+              Type=LONG
+          ]
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.18362.0\um\d2d1helper.h(152,61): warning C4244: “初始化”: 从“Type”转换到“FLOAT”，可能丢失数据
+          with
+          [
+              Type=LONG
+          ]
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.18362.0\um\d2d1helper.h(152,68): warning C4838: 从“Type”转换到“FLOAT”需要收缩转换
+          with
+          [
+              Type=LONG
+          ]
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.18362.0\um\d2d1helper.h(152,68): warning C4244: “初始化”: 从“Type”转换到“FLOAT”，可能丢失数据
+          with
+          [
+              Type=LONG
+          ]
+E:\源代码\Redstone-Designer\src\windows\Redstone Designer\main.cpp(30): warning C4715: “wWinMain”: 不是所有的控件路径都返回值
+E:\源代码\Redstone-Designer\src\windows\Redstone Designer\components.hpp(255): warning C4715: “TrapDoor::SetDirection”: 不是所有的控件路径都返回值
+  LINK : 已指定 /LTCG，但不需要生成代码；从链接命令行中移除 /LTCG 以提高链接器性能
+  Redstone Designer.vcxproj -> E:\源代码\Redstone-Designer\src\windows\x64\Release\Redstone Designer.exe

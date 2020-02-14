@@ -33,3 +33,8 @@
 
 # Extra Items
 .vscode
+*.pdb
+*.ipdb
+*.iobj
+*.res
+*.def
