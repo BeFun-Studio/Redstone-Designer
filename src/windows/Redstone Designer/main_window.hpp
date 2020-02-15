@@ -137,6 +137,7 @@ LRESULT MainWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		ID2D1HwndRenderTarget* render_target;
 		ID2D1SolidColorBrush* background_brush;
 		ID2D1SolidColorBrush* text_brush;
+		ID2D1SolidColorBrush* block_border_brush;
 		IDWriteFactory* write_factory;
 		IDWriteTextFormat* title_text_format;
 		IDWriteTextFormat* normal_text_format;
@@ -190,6 +191,11 @@ LRESULT MainWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			MessageBox(hwnd, L"Create DirectX brush failed!\n\nApplication will be terminated.", L"Error", MB_OK | MB_ICONERROR);
 			PostQuitMessage(1);
 		}
+		if (FAILED(render_target->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Gray), &block_border_brush)))
+		{
+			MessageBox(hwnd, L"Create DirectX brush failed!\n\nApplication will be terminated.", L"Error", MB_OK | MB_ICONERROR);
+			PostQuitMessage(1);
+		}
 		render_target->BeginDraw();
 		render_target->Clear(D2D1::ColorF(D2D1::ColorF::White));
 		render_target->FillRectangle(D2D1::Rect(client_rect.left,client_rect.top,client_rect.right,client_rect.bottom), background_brush);
@@ -207,12 +213,17 @@ LRESULT MainWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				{
 					for (list<Block>::iterator itor = CurrentLayer->blocks.begin(); itor != CurrentLayer->blocks.end(); itor++)
 					{
-						if (itor->GetLocation().x > CurrentViewingLocation.x - (client_rect.right / 2 - 1) && \
-							itor->GetLocation().x<CurrentViewingLocation.x + (client_rect.right / 2 + 1) && \
-							itor->GetLocation().y>CurrentViewingLocation.y - (client_rect.bottom / 2 - 1) && \
-							itor->GetLocation().y < CurrentViewingLocation.y + (client_rect.bottom / 2 + 1))
-						{
-						}
+						Location start_draw_location;
+						const int block_count_can_display_x = client_rect.right / BlockViewSize;
+						const int block_count_can_display_y = client_rect.bottom / BlockViewSize;
+						if (abs(itor->GetLocation().x - CurrentViewingLocation.x) <= block_count_can_display_x)
+							if (itor->GetLocation().x - CurrentViewingLocation.x < 0)
+								start_draw_location.x = block_count_can_display_x * BlockViewSize / 2 - BlockViewSize * abs(itor->GetLocation().x - CurrentViewingLocation.x);
+						if (abs(itor->GetLocation().y - CurrentViewingLocation.y) <= block_count_can_display_y)
+							if (itor->GetLocation().y - CurrentViewingLocation.y < 0)
+								start_draw_location.y = block_count_can_display_y * BlockViewSize / 2 - BlockViewSize * abs(itor->GetLocation().y - CurrentViewingLocation.y);
+						render_target->FillRectangle(D2D1::Rect(start_draw_location.x, start_draw_location.y, start_draw_location.x + BlockViewSize, start_draw_location.y + BlockViewSize), text_brush);
+						render_target->DrawRectangle(D2D1::Rect(start_draw_location.x, start_draw_location.y, start_draw_location.x + BlockViewSize, start_draw_location.y + BlockViewSize), block_border_brush);
 					}
 				}
 			break;
@@ -225,6 +236,7 @@ LRESULT MainWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		RELEASE_D2D_RESOURCE(title_text_format);
 		RELEASE_D2D_RESOURCE(write_factory);
 		RELEASE_D2D_RESOURCE(render_target);
+		RELEASE_D2D_RESOURCE(block_border_brush);
 		RELEASE_D2D_RESOURCE(text_brush);
 		RELEASE_D2D_RESOURCE(background_brush);
 		RELEASE_D2D_RESOURCE(factory);
