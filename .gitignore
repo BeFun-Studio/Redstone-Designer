@@ -41,3 +41,6 @@
 *.log
 *.tlog
 *.idb
+*.ipch
+*.ilk
+*.db

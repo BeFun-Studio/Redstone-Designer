@@ -215,6 +215,7 @@
     <ClInclude Include="main_window.hpp" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="texture_loader.hpp" />
+    <ClInclude Include="time_checker.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />

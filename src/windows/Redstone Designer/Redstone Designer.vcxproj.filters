@@ -47,6 +47,9 @@
     <ClInclude Include="texture_loader.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="time_checker.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc">

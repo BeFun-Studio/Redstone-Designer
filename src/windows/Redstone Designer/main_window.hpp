@@ -2,11 +2,14 @@
 #include <Windows.h>
 #include <direct.h>
 #include <d2d1.h>
+#include <dxgi1_6.h>
 #include <d3d12.h>
 #include <dwrite.h>
+#include <DirectXMath.h>
 #include <vector>
 #include "api.hpp"
 #include "circuit.hpp"
+#include "time_checker.hpp"
 #include "resource.h"
 
 #define WIN32_LEAN_AND_MEAN
@@ -27,7 +30,6 @@ enum MAIN_WINDOW_STATUS
 
 MAIN_WINDOW_STATUS CurrentMainWindowStatus;
 WNDCLASS MainWindowClass;
-bool RequestedRepaintWindow;
 HWND MainWindowHandle;
 unsigned char BlockViewSize;
 CircuitLayer *CurrentLayer;
@@ -36,7 +38,65 @@ wstring CurrentEditingFileName;
 vector<HWND>buttons;
 vector<HWND>edits;
 vector<HWND>editors;
+D3D12_VIEWPORT viewport;
+
+list<DirectXResource<IDXGIFactory5*>>D3DFactories;
 HINSTANCE ApplicationInstance;
+
+struct DrawingThreadParameters
+{
+	ID2D1RenderTarget *render_target;
+};
+
+struct DrawBlockThreadParameters :public DrawingThreadParameters
+{
+	ID2D1Brush* block_brush;
+	ID2D1Brush* block_border_brush;
+};
+
+DWORD WINAPI DrawBlocks(LPVOID lpParameter)
+{
+	DrawBlockThreadParameters* parameters = (DrawBlockThreadParameters*)lpParameter;
+	RECT client_rect;
+	GetClientRect(MainWindowHandle, &client_rect);
+	for (list<Block>::iterator itor = CurrentLayer->blocks.begin(); itor != CurrentLayer->blocks.end(); itor++)
+	{
+		Location start_draw_location;
+		const int block_count_can_display_x = client_rect.right / BlockViewSize;
+		const int block_count_can_display_y = client_rect.bottom / BlockViewSize;
+		if (abs(itor->GetLocation().x - CurrentViewingLocation.x) <= block_count_can_display_x)
+			if (itor->GetLocation().x - CurrentViewingLocation.x < 0)
+				start_draw_location.x = block_count_can_display_x * BlockViewSize / 2 - BlockViewSize * abs(itor->GetLocation().x - CurrentViewingLocation.x);
+		if (abs(itor->GetLocation().y - CurrentViewingLocation.y) <= block_count_can_display_y)
+			if (itor->GetLocation().y - CurrentViewingLocation.y < 0)
+				start_draw_location.y = block_count_can_display_y * BlockViewSize / 2 - BlockViewSize * abs(itor->GetLocation().y - CurrentViewingLocation.y);
+		parameters->render_target->FillRectangle(D2D1::Rect(start_draw_location.x, start_draw_location.y, start_draw_location.x + BlockViewSize, start_draw_location.y + BlockViewSize), parameters->block_brush);
+		parameters->render_target->DrawRectangle(D2D1::Rect(start_draw_location.x, start_draw_location.y, start_draw_location.x + BlockViewSize, start_draw_location.y + BlockViewSize), parameters->block_border_brush);
+	}
+	return 0;
+}
+
+DWORD WINAPI DrawRedstoneBlocks(LPVOID lpParameter)
+{
+	DrawBlockThreadParameters* parameters = (DrawBlockThreadParameters*)lpParameter;
+	RECT client_rect;
+	GetClientRect(MainWindowHandle, &client_rect);
+	for (list<RedstoneBlock>::iterator itor = CurrentLayer->redstone_blocks.begin(); itor != CurrentLayer->redstone_blocks.end(); itor++)
+	{
+		Location start_draw_location;
+		const int block_count_can_display_x = client_rect.right / BlockViewSize;
+		const int block_count_can_display_y = client_rect.bottom / BlockViewSize;
+		if (abs(itor->GetLocation().x - CurrentViewingLocation.x) <= block_count_can_display_x)
+			if (itor->GetLocation().x - CurrentViewingLocation.x < 0)
+				start_draw_location.x = block_count_can_display_x * BlockViewSize / 2 - BlockViewSize * abs(itor->GetLocation().x - CurrentViewingLocation.x);
+		if (abs(itor->GetLocation().y - CurrentViewingLocation.y) <= block_count_can_display_y)
+			if (itor->GetLocation().y - CurrentViewingLocation.y < 0)
+				start_draw_location.y = block_count_can_display_y * BlockViewSize / 2 - BlockViewSize * abs(itor->GetLocation().y - CurrentViewingLocation.y);
+		parameters->render_target->FillRectangle(D2D1::Rect(start_draw_location.x, start_draw_location.y, start_draw_location.x + BlockViewSize, start_draw_location.y + BlockViewSize), parameters->block_brush);
+		parameters->render_target->DrawRectangle(D2D1::Rect(start_draw_location.x, start_draw_location.y, start_draw_location.x + BlockViewSize, start_draw_location.y + BlockViewSize), parameters->block_border_brush);
+	}
+	return 0;
+}
 
 LRESULT MainWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
@@ -130,49 +190,51 @@ LRESULT MainWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		}
 		break;
 	case WM_PAINT:
+	{
 		/* Prepares for paint process. */
 		RECT client_rect;
 		GetClientRect(hwnd, &client_rect);
-		ID2D1Factory* factory;
-		ID2D1HwndRenderTarget* render_target;
-		ID2D1SolidColorBrush* background_brush;
-		ID2D1SolidColorBrush* text_brush;
-		ID2D1SolidColorBrush* block_border_brush;
-		IDWriteFactory* write_factory;
-		IDWriteTextFormat* title_text_format;
-		IDWriteTextFormat* normal_text_format;
-		if (FAILED(D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &factory)))
+		DirectXResource<ID2D1Factory*> factory;
+		DirectXResource<ID2D1HwndRenderTarget*> render_target;
+		DirectXResource<ID2D1SolidColorBrush*> background_brush;
+		DirectXResource<ID2D1SolidColorBrush*> text_brush;
+		DirectXResource<ID2D1SolidColorBrush*> block_border_brush;
+		DirectXResource<ID2D1SolidColorBrush*> circuit_bottom_brush;
+		DirectXResource<IDWriteFactory*> write_factory;
+		DirectXResource<IDWriteTextFormat*> title_text_format;
+		DirectXResource<IDWriteTextFormat*> normal_text_format;
+		if (FAILED(D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, factory.GetResourcePointer())))
 		{
 			MessageBox(hwnd, L"Create DirectX factory failed!\n\nApplication will be terminated.", L"Error", MB_OK | MB_ICONERROR);
 			PostQuitMessage(1);
 		}
-		if (FAILED(DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(write_factory), (IUnknown**)&write_factory)))
+		if (FAILED(DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(write_factory.GetResource()), (IUnknown**)write_factory.GetResourcePointer())))
 		{
 			MessageBox(hwnd, L"Create DirectX write factory failed!\n\nApplication will be terminated.", L"Error", MB_OK | MB_ICONERROR);
 			PostQuitMessage(1);
 		}
-		if (FAILED(write_factory->CreateTextFormat(L"Unifont", NULL, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 30, L"", &title_text_format)))
+		if (FAILED(write_factory.GetResource()->CreateTextFormat(L"Unifont", NULL, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 30, L"", title_text_format.GetResourcePointer())))
 		{
 			MessageBox(hwnd, L"Create DirectX text format failed!\n\nApplication will be terminated.", L"Error", MB_OK | MB_ICONERROR);
 			PostQuitMessage(1);
 		}
-		if (FAILED(write_factory->CreateTextFormat(L"Unifont", NULL, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 20, L"", &normal_text_format)))
+		if (FAILED(write_factory.GetResource()->CreateTextFormat(L"Unifont", NULL, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 20, L"", normal_text_format.GetResourcePointer())))
 		{
 			MessageBox(hwnd, L"Create DirectX text format failed!\n\nApplication will be terminated.", L"Error", MB_OK | MB_ICONERROR);
 			PostQuitMessage(1);
 		}
-		if (FAILED(factory->CreateHwndRenderTarget(D2D1::RenderTargetProperties(), D2D1::HwndRenderTargetProperties(hwnd, D2D1::SizeU(client_rect.right, client_rect.bottom)), &render_target)))
+		if (FAILED(factory.GetResource()->CreateHwndRenderTarget(D2D1::RenderTargetProperties(), D2D1::HwndRenderTargetProperties(hwnd, D2D1::SizeU(client_rect.right, client_rect.bottom)), render_target.GetResourcePointer())))
 		{
 			MessageBox(hwnd, L"Create DirectX render target failed!\n\nApplication will be terminated.", L"Error", MB_OK | MB_ICONERROR);
 			PostQuitMessage(1);
 		}
-		title_text_format->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_JUSTIFIED);
-		title_text_format->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_JUSTIFIED);
-		normal_text_format->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_JUSTIFIED);
-		normal_text_format->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_JUSTIFIED);
+		title_text_format.GetResource()->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_JUSTIFIED);
+		title_text_format.GetResource()->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_JUSTIFIED);
+		normal_text_format.GetResource()->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_JUSTIFIED);
+		normal_text_format.GetResource()->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_JUSTIFIED);
 		if (CurrentMainWindowStatus == INDEX)
 		{
-			if (FAILED(render_target->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Firebrick), &background_brush)))
+			if (FAILED(render_target.GetResource()->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Firebrick), background_brush.GetResourcePointer())))
 			{
 				MessageBox(hwnd, L"Create DirectX brush failed!\n\nApplication will be terminated.", L"Error", MB_OK | MB_ICONERROR);
 				PostQuitMessage(1);
@@ -180,67 +242,64 @@ LRESULT MainWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		}
 		else
 		{
-			if (FAILED(render_target->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::LightGray), &background_brush)))
+			if (FAILED(render_target.GetResource()->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::LightGray), background_brush.GetResourcePointer())))
 			{
 				MessageBox(hwnd, L"Create DirectX brush failed!\n\nApplication will be terminated.", L"Error", MB_OK | MB_ICONERROR);
 				PostQuitMessage(1);
 			}
 		}
-		if (FAILED(render_target->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::White), &text_brush)))
+		if (FAILED(render_target.GetResource()->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::White), text_brush.GetResourcePointer())))
 		{
 			MessageBox(hwnd, L"Create DirectX brush failed!\n\nApplication will be terminated.", L"Error", MB_OK | MB_ICONERROR);
 			PostQuitMessage(1);
 		}
-		if (FAILED(render_target->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Gray), &block_border_brush)))
+		if (FAILED(render_target.GetResource()->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Gray), block_border_brush.GetResourcePointer())))
 		{
 			MessageBox(hwnd, L"Create DirectX brush failed!\n\nApplication will be terminated.", L"Error", MB_OK | MB_ICONERROR);
 			PostQuitMessage(1);
 		}
-		render_target->BeginDraw();
-		render_target->Clear(D2D1::ColorF(D2D1::ColorF::White));
-		render_target->FillRectangle(D2D1::Rect(client_rect.left,client_rect.top,client_rect.right,client_rect.bottom), background_brush);
+		if (FAILED(render_target.GetResource()->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Black), circuit_bottom_brush.GetResourcePointer())))
+		{
+			MessageBox(hwnd, L"Create DirectX brush failed!\n\nApplication will be terminated.", L"Error", MB_OK | MB_ICONERROR);
+			PostQuitMessage(1);
+		}
+		render_target.GetResource()->BeginDraw();
+		render_target.GetResource()->Clear(D2D1::ColorF(D2D1::ColorF::White));
+		render_target.GetResource()->FillRectangle(D2D1::Rect(client_rect.left, client_rect.top, client_rect.right, client_rect.bottom), background_brush.GetResource());
 		switch (CurrentMainWindowStatus)
 		{
 		case INDEX:
-			render_target->DrawText(L"Redstone Designer", wcslen(L"Redstone Designer"), title_text_format, &D2D1::RectF(client_rect.left,client_rect.top,client_rect.right,client_rect.bottom), text_brush, D2D1_DRAW_TEXT_OPTIONS_NONE, DWRITE_MEASURING_MODE_NATURAL);
-			render_target->DrawText(L"\n\nChoose a option to continue:", wcslen(L"\n\nChoose a option to continue:"), normal_text_format, &D2D1::RectF(client_rect.left, client_rect.top, client_rect.right, client_rect.bottom), text_brush, D2D1_DRAW_TEXT_OPTIONS_NONE, DWRITE_MEASURING_MODE_NATURAL);
+			render_target.GetResource()->DrawText(L"Redstone Designer", wcslen(L"Redstone Designer"), title_text_format.GetResource(), &D2D1::RectF(client_rect.left, client_rect.top, client_rect.right, client_rect.bottom), text_brush.GetResource(), D2D1_DRAW_TEXT_OPTIONS_NONE, DWRITE_MEASURING_MODE_NATURAL);
+			render_target.GetResource()->DrawText(L"\n\nChoose a option to continue:", wcslen(L"\n\nChoose a option to continue:"), normal_text_format.GetResource(), &D2D1::RectF(client_rect.left, client_rect.top, client_rect.right, client_rect.bottom), text_brush.GetResource(), D2D1_DRAW_TEXT_OPTIONS_NONE, DWRITE_MEASURING_MODE_NATURAL);
 			break;
 		case FILE_EDITORS:
-			if (CurrentEditingFileName.empty())
+			if (CurrentEditingFileName.length() == 0)
 				break;
-			for (int i = 0; i < client_rect.right; i++)
-				for (int j = 0; j < client_rect.bottom; j++)
-				{
-					for (list<Block>::iterator itor = CurrentLayer->blocks.begin(); itor != CurrentLayer->blocks.end(); itor++)
-					{
-						Location start_draw_location;
-						const int block_count_can_display_x = client_rect.right / BlockViewSize;
-						const int block_count_can_display_y = client_rect.bottom / BlockViewSize;
-						if (abs(itor->GetLocation().x - CurrentViewingLocation.x) <= block_count_can_display_x)
-							if (itor->GetLocation().x - CurrentViewingLocation.x < 0)
-								start_draw_location.x = block_count_can_display_x * BlockViewSize / 2 - BlockViewSize * abs(itor->GetLocation().x - CurrentViewingLocation.x);
-						if (abs(itor->GetLocation().y - CurrentViewingLocation.y) <= block_count_can_display_y)
-							if (itor->GetLocation().y - CurrentViewingLocation.y < 0)
-								start_draw_location.y = block_count_can_display_y * BlockViewSize / 2 - BlockViewSize * abs(itor->GetLocation().y - CurrentViewingLocation.y);
-						render_target->FillRectangle(D2D1::Rect(start_draw_location.x, start_draw_location.y, start_draw_location.x + BlockViewSize, start_draw_location.y + BlockViewSize), text_brush);
-						render_target->DrawRectangle(D2D1::Rect(start_draw_location.x, start_draw_location.y, start_draw_location.x + BlockViewSize, start_draw_location.y + BlockViewSize), block_border_brush);
-					}
-				}
+			render_target.GetResource()->FillRectangle(D2D1::Rect(client_rect.left, client_rect.top, client_rect.right, client_rect.bottom), circuit_bottom_brush.GetResource());
+			DrawBlockThreadParameters draw_block_thread_parameters;
+			draw_block_thread_parameters.block_border_brush = block_border_brush.GetResource();
+			draw_block_thread_parameters.block_brush = text_brush.GetResource();
+			draw_block_thread_parameters.render_target = render_target.GetResource();
+			DWORD CurrentThreadId = 101;
+			HANDLE DrawBlockThread = CreateThread(NULL, NULL, DrawBlocks, &draw_block_thread_parameters, NULL, &CurrentThreadId);
+			CurrentThreadId++;
 			break;
 		}
-		if (FAILED(render_target->EndDraw()))
+		if (FAILED(render_target.GetResource()->EndDraw()))
 			if (MessageBox(hwnd, L"Draw failed!\n\nContinue?", L"Error", MB_YESNO | MB_ICONWARNING) == IDNO)
 			{
 				PostQuitMessage(1);
 			}
-		RELEASE_D2D_RESOURCE(title_text_format);
-		RELEASE_D2D_RESOURCE(write_factory);
-		RELEASE_D2D_RESOURCE(render_target);
-		RELEASE_D2D_RESOURCE(block_border_brush);
-		RELEASE_D2D_RESOURCE(text_brush);
-		RELEASE_D2D_RESOURCE(background_brush);
-		RELEASE_D2D_RESOURCE(factory);
+		title_text_format.Release();
+		write_factory.Release();
+		render_target.Release();
+		block_border_brush.Release();
+		circuit_bottom_brush.Release();
+		text_brush.Release();
+		background_brush.Release();
+		factory.Release();
 		break;
+	}
 	case WM_CLOSE:
 		DestroyWindow(hwnd);
 		break;
@@ -248,6 +307,15 @@ LRESULT MainWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		PostQuitMessage(0);
 		break;
 	}
+	#ifdef ENABLE_TIME_CHECK
+	RECT client_rect;
+	GetClientRect(hwnd, &client_rect);
+	HDC hdc = GetDC(hwnd);
+	SetBkMode(hdc, TRANSPARENT);
+	SetTextColor(hdc, RGB(255, 255, 255));
+	TextOut(hdc, 0, client_rect.bottom - 30, L"Redstone Designer Codename 'Emerald'", wcslen(L"Redstone Designer Codename 'Emerald'"));
+	TextOut(hdc, 0, client_rect.bottom - 15, L"Evaluation Copy. Test 1.", wcslen(L"Evaluation Copy. Test 0"));
+	#endif
 	return DefWindowProc(hwnd, uMsg, wParam, lParam);
 }
 void InitMainWindow(HINSTANCE hInstance)
@@ -269,18 +337,6 @@ void InitMainWindow(HINSTANCE hInstance)
 	MainWindowHandle = CreateWindow(L"REDSTONE_DESIGNER", L"Minecraft Redstone Designer", WS_OVERLAPPEDWINDOW&~WS_SIZEBOX&~WS_MAXIMIZEBOX, CW_USEDEFAULT, CW_USEDEFAULT, 1024, 768, NULL, NULL, hInstance, NULL);
 	ShowWindow(MainWindowHandle, SW_SHOW);
 	SendMessage(MainWindowHandle, WM_SWITCH_STATUS, (WPARAM)hInstance, NULL);
-}
-DWORD RequestedRepaintMainWindowFlagCheckThread(LPVOID lpParameter)
-{
-	while (true)
-	{
-		if (RequestedRepaintWindow)
-		{
-			SendMessage(MainWindowHandle, WM_PAINT, NULL, NULL);
-			RequestedRepaintWindow = false;
-		}
-		Sleep(1);
-	}
 }
 void DestroyMainWindow(HINSTANCE hInstance)
 {
