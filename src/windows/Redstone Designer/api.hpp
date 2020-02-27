@@ -41,6 +41,83 @@ public:
     }
 };
 
+struct BeepCommand
+{
+    bool beep;
+    DWORD frequency;
+    DWORD duration;
+};
+
+class BeepFrequencySequence
+{
+private:
+    std::vector<BeepCommand>beep_commands;
+    size_t current_command_index;
+public:
+    BeepFrequencySequence()
+    {
+        this->current_command_index = 0;
+    }
+    BeepFrequencySequence(size_t argument_count, ...)
+    {
+        va_list args;
+        va_start(args, argument_count);
+        for (int i = 0; i < argument_count; i++)
+            this->beep_commands.push_back(va_arg(args, BeepCommand));
+        va_end(args);
+        this->current_command_index = 0;
+    }
+    bool LoadFromFile(LPCWSTR filename)
+    {
+        FILE* fp = _wfopen(filename, L"r");
+        if (fp == NULL)
+        {
+            fclose(fp);
+            return false;
+        }
+        fseek(fp, 0, SEEK_END);
+        if (ftell(fp) % 9 != 0)
+        {
+            fclose(fp);
+            return false;
+        }
+        bool beep;
+        DWORD frequency;
+        DWORD duration;
+        for (int i = 0; i < ftell(fp) / 5; i++)
+        {
+            fread(&beep, 1, 1, fp);
+            fread(&frequency, sizeof(int), 1, fp);
+            fread(&beep, sizeof(int), 1, fp);
+            BeepCommand push_command = { beep,frequency,duration };
+            this->beep_commands.push_back(push_command);
+        }
+        fclose(fp);
+        return true;
+    }
+    void Load(size_t argument_count, ...)
+    {
+        va_list args;
+        va_start(args, argument_count);
+        for (int i = 0; i < argument_count; i++)
+            this->beep_commands.push_back(va_arg(args, BeepCommand));
+        va_end(args);
+        this->current_command_index = 0;
+    }
+    bool Play()
+    {
+        if (this->current_command_index == this->beep_commands.size() - 1)
+            return false;
+        if (!this->beep_commands[this->current_command_index].beep)
+        {
+            Sleep(this->beep_commands[this->current_command_index].duration);
+            return true;
+        }
+        Beep(this->beep_commands[this->current_command_index].frequency, this->beep_commands[this->current_command_index].duration);
+        return true;
+    }
+};
+
 HFONT _CreateFont(UINT font_size, LPCWSTR font_name, bool italic, bool underline, bool strike_out)
 {
     LOGFONT CurrentFont;

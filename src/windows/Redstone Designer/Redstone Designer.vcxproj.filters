@@ -29,9 +29,6 @@
     <ClInclude Include="components.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="main_window.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="circuit.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -50,6 +47,21 @@
     <ClInclude Include="time_checker.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="credits.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="tools.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="asmfuncs.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="window.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="dllfuncs.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc">
@@ -63,5 +75,16 @@
     <Image Include="logo.ico">
       <Filter>资源文件</Filter>
     </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <MASM Include="asmfuncs_x64.asm">
+      <Filter>源文件</Filter>
+    </MASM>
+    <MASM Include="asmfuncs_x86.asm">
+      <Filter>源文件</Filter>
+    </MASM>
+    <MASM Include="asmfuncs.inc">
+      <Filter>头文件</Filter>
+    </MASM>
   </ItemGroup>
 </Project>

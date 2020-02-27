@@ -1,12 +1,36 @@
-#include "main_window.hpp"
+#include "window.hpp"
+
+DWORD WINAPI BeepThreadProc(LPVOID lpParameter)
+{
+	Beep(530, 300);
+	return 0;
+}
+HANDLE BeepThread;
 
 INT WINAPI wWinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPWSTR lpCmdLine,INT nCmdShow)
 {
 	if (!CheckTime())
 	{
-		MessageBox(NULL, L"This evaluation copy of Redstone Designer has\nexpired or it is a invalid evaluation copy!", L"Error!", MB_OK | MB_ICONERROR);
+		BeepThread = CreateThread(NULL, 0, BeepThreadProc, NULL, NULL, NULL);
+		MessageBox(NULL, L"This evaluation copy of Redstone Designer has\n"
+			"expired or it is a invalid evaluation copy!", L"Error!", MB_OK | MB_ICONERROR);
 		return 101;
 	}
+	if (!InitDirectX())
+	{
+		MessageBox(NULL, L"Your DirectX version is lower than 12.0,\n"
+			"you cannot launch Redstone Designer.", L"Error", MB_OK | MB_ICONERROR);
+		return 102;
+	}
+	if (!LoadDllFunctions())
+	{
+		MessageBox(NULL, L"Load DLL functions failed!", L"Error", MB_OK | MB_ICONERROR);
+		return 103;
+	}
+	if (InitializationCuda() != 0)
+		CudaBoostEnabled = false;
+	else
+		CudaBoostEnabled = true;
 	try
 	{
 		ApplicationInstance = hInstance;

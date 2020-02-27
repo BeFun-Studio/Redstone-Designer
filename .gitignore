@@ -44,3 +44,6 @@
 *.ipch
 *.ilk
 *.db
+*.exp
+*.lock
+*.ide

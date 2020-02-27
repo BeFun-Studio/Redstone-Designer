@@ -10,6 +10,8 @@
 #include "api.hpp"
 #include "circuit.hpp"
 #include "time_checker.hpp"
+#include "asmfuncs.h"
+#include "dllfuncs.hpp"
 #include "resource.h"
 
 #define WIN32_LEAN_AND_MEAN
@@ -21,6 +23,7 @@
 #define MENU_BUTTON_CREATE_NEW_FILE_INDEX 1000
 #define MENU_BUTTON_OPEN_EXISTING_FILE_INDEX 1001
 #define MENU_BUTTON_CONTINUE_WITHOUT_ANY_OPERATION_INDEX 1002
+#define MENU_BUTTON_ABOUT_WINDOW_OK 1100
 
 enum MAIN_WINDOW_STATUS
 {
@@ -38,10 +41,26 @@ wstring CurrentEditingFileName;
 vector<HWND>buttons;
 vector<HWND>edits;
 vector<HWND>editors;
-D3D12_VIEWPORT viewport;
+D3D12_VIEWPORT ViewPort;
+D3D12_VERTEX_BUFFER_VIEW VertexBufferView;
+DirectXResource<IDXGIFactory5*> factory;
+DirectXResource<IDXGIAdapter1*> adapter;
+DirectXResource<ID3D12Device*> device;
+DirectXResource<ID3D12CommandQueue*> CommandQueue;
+DirectXResource<IDXGISwapChain1*> SwapChain1;
+DirectXResource<IDXGISwapChain3*> SwapChain3;
+DirectXResource<ID3D12DescriptorHeap*> DescriptorHeap;
+list<DirectXResource<ID3D12Resource*>> RenderTargets;
+DirectXResource<ID3D12CommandAllocator*> CommandAllocator;
+DirectXResource<ID3D12RootSignature*> RootSignature;
+DirectXResource<ID3D12PipelineState*> PipelineState;
+DirectXResource<ID3D12Resource*> VertexBuffer;
+DirectXResource<ID3D12Fence*> fence;
 
-list<DirectXResource<IDXGIFactory5*>>D3DFactories;
 HINSTANCE ApplicationInstance;
+
+bool CudaBoostEnabled = false;
+bool OpenCLBoostEnabled = false;
 
 struct DrawingThreadParameters
 {
@@ -70,8 +89,6 @@ DWORD WINAPI DrawBlocks(LPVOID lpParameter)
 		if (abs(itor->GetLocation().y - CurrentViewingLocation.y) <= block_count_can_display_y)
 			if (itor->GetLocation().y - CurrentViewingLocation.y < 0)
 				start_draw_location.y = block_count_can_display_y * BlockViewSize / 2 - BlockViewSize * abs(itor->GetLocation().y - CurrentViewingLocation.y);
-		parameters->render_target->FillRectangle(D2D1::Rect(start_draw_location.x, start_draw_location.y, start_draw_location.x + BlockViewSize, start_draw_location.y + BlockViewSize), parameters->block_brush);
-		parameters->render_target->DrawRectangle(D2D1::Rect(start_draw_location.x, start_draw_location.y, start_draw_location.x + BlockViewSize, start_draw_location.y + BlockViewSize), parameters->block_border_brush);
 	}
 	return 0;
 }
@@ -98,7 +115,33 @@ DWORD WINAPI DrawRedstoneBlocks(LPVOID lpParameter)
 	return 0;
 }
 
-LRESULT MainWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT WINAPI AboutWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+	switch (uMsg)
+	{
+	case WM_PAINT:
+	{
+		PAINTSTRUCT ps;
+		HDC hdc = BeginPaint(hwnd, &ps);
+		HFONT title_font = _CreateFont(20, L"Unifont", false, false, false);
+		HFONT text_font = _CreateFont(15, L"Unifont", false, false, false);
+		SetBkMode(hdc, TRANSPARENT);
+		SetTextColor(hdc, RGB(255, 255, 255));
+		SelectObject(hdc, title_font);
+		TextOut(hdc, 5, 5, L"Redstone Designer", wcslen(L"Redstone Designer"));
+		SelectObject(hdc, text_font);
+		TextOut(hdc, 5, 40, L"Copyright(C)2020 CodesBuilder", wcslen(L"Copyright(C)2020 CodesBuilder"));
+		TextOut(hdc, 5, 65, L"Version:1.0.0 Inside Test 0", wcslen(L"Version:1.0.0 Inside Test 0"));
+		TextOut(hdc, 5, 90, L"This software is a free software.", wcslen(L"This software is a free software."));
+		DeleteObject(title_font);
+		DeleteObject(text_font);
+		break;
+	}
+	}
+	return DefWindowProc(hwnd, uMsg, wParam, lParam);
+}
+
+LRESULT WINAPI MainWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg)
 	{
@@ -135,6 +178,34 @@ LRESULT MainWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		case ID_FILE_OPEN:
 			SendMessage(hwnd, WM_COMMAND, MENU_BUTTON_OPEN_EXISTING_FILE_INDEX, NULL);
 			break;
+		case ID_HELP_ABOUT:
+		{
+			RECT window_rect;
+			GetWindowRect(hwnd, &window_rect);
+			WNDCLASS about_window_class;
+			HWND about_window_handle;
+			about_window_class = { 0 };
+			about_window_class.hCursor = LoadCursor(ApplicationInstance, IDC_ARROW);
+			about_window_class.lpszClassName = L"REDSTONE_DESIGNER_ABOUT_WINDOW";
+			about_window_class.hbrBackground = CreateSolidBrush(RGB(80, 80, 120));
+			about_window_class.hIcon = LoadIcon(ApplicationInstance, (LPCWSTR)IDI_LOGO);
+			about_window_class.hInstance = ApplicationInstance;
+			about_window_class.lpfnWndProc = AboutWindowProc;
+			if (RegisterClass(&about_window_class) == NULL)
+			{
+				MessageBox(MainWindowHandle, L"Create window class failed!", L"Error", MB_OK | MB_ICONERROR);
+				break;
+			}
+			about_window_handle = CreateWindow(L"REDSTONE_DESIGNER_ABOUT_WINDOW", L"About Redstone Designer", WS_OVERLAPPEDWINDOW & ~WS_SIZEBOX & ~WS_MAXIMIZEBOX & ~WS_MINIMIZEBOX, window_rect.right / 2, window_rect.bottom / 2, 500, 400, MainWindowHandle, NULL, ApplicationInstance, NULL);
+			if (about_window_handle == NULL)
+			{
+				MessageBox(about_window_handle, L"Create window failed!", L"Error", MB_OK | MB_ICONERROR);
+				break;
+			}
+			ShowWindow(about_window_handle,SW_SHOW);
+			WaitForSingleObject(about_window_handle, INFINITE);
+			UnregisterClass(L"REDSTONE_DESIGNER_ABOUT_WINDOW", ApplicationInstance);
+		}
 		}
 		break;
 	case WM_SWITCH_STATUS:
@@ -273,6 +344,7 @@ LRESULT MainWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			render_target.GetResource()->DrawText(L"\n\nChoose a option to continue:", wcslen(L"\n\nChoose a option to continue:"), normal_text_format.GetResource(), &D2D1::RectF(client_rect.left, client_rect.top, client_rect.right, client_rect.bottom), text_brush.GetResource(), D2D1_DRAW_TEXT_OPTIONS_NONE, DWRITE_MEASURING_MODE_NATURAL);
 			break;
 		case FILE_EDITORS:
+		{
 			if (CurrentEditingFileName.length() == 0)
 				break;
 			render_target.GetResource()->FillRectangle(D2D1::Rect(client_rect.left, client_rect.top, client_rect.right, client_rect.bottom), circuit_bottom_brush.GetResource());
@@ -284,6 +356,7 @@ LRESULT MainWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			HANDLE DrawBlockThread = CreateThread(NULL, NULL, DrawBlocks, &draw_block_thread_parameters, NULL, &CurrentThreadId);
 			CurrentThreadId++;
 			break;
+		}
 		}
 		if (FAILED(render_target.GetResource()->EndDraw()))
 			if (MessageBox(hwnd, L"Draw failed!\n\nContinue?", L"Error", MB_YESNO | MB_ICONWARNING) == IDNO)
@@ -314,9 +387,16 @@ LRESULT MainWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	SetBkMode(hdc, TRANSPARENT);
 	SetTextColor(hdc, RGB(255, 255, 255));
 	TextOut(hdc, 0, client_rect.bottom - 30, L"Redstone Designer Codename 'Emerald'", wcslen(L"Redstone Designer Codename 'Emerald'"));
-	TextOut(hdc, 0, client_rect.bottom - 15, L"Evaluation Copy. Test 1.", wcslen(L"Evaluation Copy. Test 0"));
+	TextOut(hdc, 0, client_rect.bottom - 15, L"Evaluation Copy. Inside Test 0", wcslen(L"Evaluation Copy. Inside Test 0"));
 	#endif
 	return DefWindowProc(hwnd, uMsg, wParam, lParam);
+}
+bool InitDirectX()
+{
+	//return false;
+CreateDirectXDevice:
+
+	return true;
 }
 void InitMainWindow(HINSTANCE hInstance)
 {
@@ -329,6 +409,7 @@ void InitMainWindow(HINSTANCE hInstance)
 	MainWindowClass.hCursor = LoadCursor(hInstance, IDC_ARROW);
 	MainWindowClass.style = CS_HREDRAW | CS_VREDRAW;
 	MainWindowClass.lpszMenuName = (LPCWSTR)IDR_MENU;
+	MainWindowClass.hbrBackground = (HBRUSH)GetStockObject(NULL_BRUSH);
 	if (RegisterClass(&MainWindowClass) == NULL)
 	{
 		MessageBox(NULL, L"Register Window Class Failed!", L"Error", MB_OK | MB_ICONERROR);

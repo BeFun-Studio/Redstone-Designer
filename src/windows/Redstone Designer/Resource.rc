@@ -95,6 +95,14 @@ BEGIN
         MENUITEM "Redstone Components(&R)",     ID_PLACE_REDSTONE
         MENUITEM "Block(&B)",                   ID_PLACE_BLOCK
     END
+    POPUP "Tools(&T)"
+    BEGIN
+        MENUITEM "",                            ID_Menu
+    END
+    POPUP "Help(&H)"
+    BEGIN
+        MENUITEM "About...(&A)",                ID_HELP_ABOUT
+    END
 END
 
 

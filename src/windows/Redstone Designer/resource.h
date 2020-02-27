@@ -2,8 +2,9 @@
 // Microsoft Visual C++ 生成的包含文件。
 // 供 Resource.rc 使用
 //
-#define IDI_LOGO                       101
-#define IDR_MENU                       109
+#define IDI_LOGO                        101
+#define IDR_MENU                        109
+#define IDC_TEXTBOX1                    1001
 #define ID_BUTTON2                      40001
 #define ID_FILE_NEW                     40003
 #define ID_NEW_CIRCUITFILE              40004
@@ -24,14 +25,16 @@
 #define ID_EDIT_MOVE                    40019
 #define ID_PLACE_REDSTONE               40020
 #define ID_PLACE_BLOCK                  40021
+#define ID_Menu                         40022
+#define ID_HELP_ABOUT                   40023
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        110
-#define _APS_NEXT_COMMAND_VALUE         40022
-#define _APS_NEXT_CONTROL_VALUE         1001
+#define _APS_NEXT_RESOURCE_VALUE        115
+#define _APS_NEXT_COMMAND_VALUE         40024
+#define _APS_NEXT_CONTROL_VALUE         1007
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

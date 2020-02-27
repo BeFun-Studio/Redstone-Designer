@@ -4,23 +4,42 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 16.0.29613.14
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Redstone Designer", "Redstone Designer\Redstone Designer.vcxproj", "{B08F75AB-B384-484B-9CA4-CE0CB6E3934A}"
+	ProjectSection(ProjectDependencies) = postProject
+		{74FDC089-6E66-49ED-BC80-77E572C5D7A3} = {74FDC089-6E66-49ED-BC80-77E572C5D7A3}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CUDA Extension", "CUDA Extension\CUDA Extension.vcxproj", "{74FDC089-6E66-49ED-BC80-77E572C5D7A3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
 		Debug|x64 = Debug|x64
 		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B08F75AB-B384-484B-9CA4-CE0CB6E3934A}.Debug|Any CPU.ActiveCfg = Debug|Win32
 		{B08F75AB-B384-484B-9CA4-CE0CB6E3934A}.Debug|x64.ActiveCfg = Debug|x64
 		{B08F75AB-B384-484B-9CA4-CE0CB6E3934A}.Debug|x64.Build.0 = Debug|x64
 		{B08F75AB-B384-484B-9CA4-CE0CB6E3934A}.Debug|x86.ActiveCfg = Debug|Win32
 		{B08F75AB-B384-484B-9CA4-CE0CB6E3934A}.Debug|x86.Build.0 = Debug|Win32
+		{B08F75AB-B384-484B-9CA4-CE0CB6E3934A}.Release|Any CPU.ActiveCfg = Release|Win32
 		{B08F75AB-B384-484B-9CA4-CE0CB6E3934A}.Release|x64.ActiveCfg = Release|x64
 		{B08F75AB-B384-484B-9CA4-CE0CB6E3934A}.Release|x64.Build.0 = Release|x64
 		{B08F75AB-B384-484B-9CA4-CE0CB6E3934A}.Release|x86.ActiveCfg = Release|Win32
 		{B08F75AB-B384-484B-9CA4-CE0CB6E3934A}.Release|x86.Build.0 = Release|Win32
+		{74FDC089-6E66-49ED-BC80-77E572C5D7A3}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{74FDC089-6E66-49ED-BC80-77E572C5D7A3}.Debug|x64.ActiveCfg = Debug|x64
+		{74FDC089-6E66-49ED-BC80-77E572C5D7A3}.Debug|x64.Build.0 = Debug|x64
+		{74FDC089-6E66-49ED-BC80-77E572C5D7A3}.Debug|x86.ActiveCfg = Debug|Win32
+		{74FDC089-6E66-49ED-BC80-77E572C5D7A3}.Debug|x86.Build.0 = Debug|Win32
+		{74FDC089-6E66-49ED-BC80-77E572C5D7A3}.Release|Any CPU.ActiveCfg = Release|Win32
+		{74FDC089-6E66-49ED-BC80-77E572C5D7A3}.Release|x64.ActiveCfg = Release|x64
+		{74FDC089-6E66-49ED-BC80-77E572C5D7A3}.Release|x64.Build.0 = Release|x64
+		{74FDC089-6E66-49ED-BC80-77E572C5D7A3}.Release|x86.ActiveCfg = Release|Win32
+		{74FDC089-6E66-49ED-BC80-77E572C5D7A3}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
