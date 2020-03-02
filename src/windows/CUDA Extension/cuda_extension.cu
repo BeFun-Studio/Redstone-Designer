@@ -23,13 +23,12 @@ DLLAPI __global__ INIT_CUDA_RETURN_VALUES InitializationCuda()
 			return GET_DEVICE_PROPERTIES_FAILED;
 		else
 			if (current_device_properties.major > 3)
-			{
 				if (!SetCudaDevice(i))
 					return SET_DEVICE_FAILED;
-			}
 	}
 	if ( j == 0)
 		return NO_DEVICE_SUPPORTED_LOWEST_VERSION_CUDA;
+	return INIT_SUCCESSFULLY;
 }
 
 DLLAPI __global__ long long CudaAdd(unsigned short count, ...)
@@ -72,7 +71,7 @@ DLLAPI __global__ long long CudaDivide(unsigned short count, long long original_
 	return result;
 }
 
-INT WINAPI DllMain(HMODULE hModule, DWORD fdwReason, LPVOID lpvReserved)
+INT APIENTRY DllMain(HMODULE hModule, DWORD fdwReason, LPVOID lpvReserved)
 {
 	switch (fdwReason)
 	{

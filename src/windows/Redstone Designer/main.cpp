@@ -16,18 +16,7 @@ INT WINAPI wWinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPWSTR lpCmdLine
 			"expired or it is a invalid evaluation copy!", L"Error!", MB_OK | MB_ICONERROR);
 		return 101;
 	}
-	if (!InitDirectX())
-	{
-		MessageBox(NULL, L"Your DirectX version is lower than 12.0,\n"
-			"you cannot launch Redstone Designer.", L"Error", MB_OK | MB_ICONERROR);
-		return 102;
-	}
-	if (!LoadDllFunctions())
-	{
-		MessageBox(NULL, L"Load DLL functions failed!", L"Error", MB_OK | MB_ICONERROR);
-		return 103;
-	}
-	if (InitializationCuda() != 0)
+	if (InitializationCuda() != INIT_SUCCESSFULLY)
 		CudaBoostEnabled = false;
 	else
 		CudaBoostEnabled = true;
@@ -41,7 +30,7 @@ INT WINAPI wWinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPWSTR lpCmdLine
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		}
-		DestroyMainWindow(hInstance);
+		ApplicationDestructor(hInstance);
 		return 0;
 	}
 	catch (bad_alloc)

@@ -3,15 +3,15 @@
 #include <direct.h>
 #include <d2d1.h>
 #include <dxgi1_6.h>
-#include <d3d12.h>
 #include <dwrite.h>
-#include <DirectXMath.h>
 #include <vector>
+#include <cuda_extension.cuh>
+#include <ui_extension.h>
 #include "api.hpp"
 #include "circuit.hpp"
 #include "time_checker.hpp"
+#include "update.hpp"
 #include "asmfuncs.h"
-#include "dllfuncs.hpp"
 #include "resource.h"
 
 #define WIN32_LEAN_AND_MEAN
@@ -19,6 +19,7 @@
 #pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 
 #define WM_SWITCH_STATUS 10000
+#define WM_SET_DESCRIPTION_BAR 10001
 
 #define MENU_BUTTON_CREATE_NEW_FILE_INDEX 1000
 #define MENU_BUTTON_OPEN_EXISTING_FILE_INDEX 1001
@@ -28,10 +29,24 @@
 enum MAIN_WINDOW_STATUS
 {
 	INDEX=0,
-	FILE_EDITORS
+	FILE_EDITOR
 };
 
-MAIN_WINDOW_STATUS CurrentMainWindowStatus;
+enum SelectedAction
+{
+	NOT_SELECTED=0,
+	PLACE_REDSTONE_WIRE,
+	PLACE_REDSTONE_BLOCK,
+	PLACE_REDSTONE_TORCH,
+	PLACE_COMMAND_BLOCK,
+	PLACE_TRAP_DOOR,
+	PLACE_BLOCK,
+	SELECT_ITEMS,
+	UNSELECT_ITEMS,
+
+};
+
+MAIN_WINDOW_STATUS CurrentMainWindowStatus = INDEX;
 WNDCLASS MainWindowClass;
 HWND MainWindowHandle;
 unsigned char BlockViewSize;
@@ -41,23 +56,14 @@ wstring CurrentEditingFileName;
 vector<HWND>buttons;
 vector<HWND>edits;
 vector<HWND>editors;
-D3D12_VIEWPORT ViewPort;
-D3D12_VERTEX_BUFFER_VIEW VertexBufferView;
-DirectXResource<IDXGIFactory5*> factory;
-DirectXResource<IDXGIAdapter1*> adapter;
-DirectXResource<ID3D12Device*> device;
-DirectXResource<ID3D12CommandQueue*> CommandQueue;
-DirectXResource<IDXGISwapChain1*> SwapChain1;
-DirectXResource<IDXGISwapChain3*> SwapChain3;
-DirectXResource<ID3D12DescriptorHeap*> DescriptorHeap;
-list<DirectXResource<ID3D12Resource*>> RenderTargets;
-DirectXResource<ID3D12CommandAllocator*> CommandAllocator;
-DirectXResource<ID3D12RootSignature*> RootSignature;
-DirectXResource<ID3D12PipelineState*> PipelineState;
-DirectXResource<ID3D12Resource*> VertexBuffer;
-DirectXResource<ID3D12Fence*> fence;
+wstring MainWindowDescriptionBarText;
 
 HINSTANCE ApplicationInstance;
+
+HANDLE UpdateMainWindowTitleThread;
+HANDLE ShowUpdateAvailableTitleThread;
+HANDLE CheckUpdateAvailableFlagThread;
+HANDLE PlaySwitchStatusFromIndexToFileEditorAnimationThread;
 
 bool CudaBoostEnabled = false;
 bool OpenCLBoostEnabled = false;
@@ -72,6 +78,140 @@ struct DrawBlockThreadParameters :public DrawingThreadParameters
 	ID2D1Brush* block_brush;
 	ID2D1Brush* block_border_brush;
 };
+
+DWORD WINAPI UpdateMainWindowTitleThreadProc(LPVOID lPparameter)
+{
+	while (true)
+	{
+		SetWindowText(MainWindowHandle, L"Minecraft Redstone Designer");
+		Sleep(200);
+		SetWindowText(MainWindowHandle, L" Minecraft Redstone Designe");
+		Sleep(200);
+		SetWindowText(MainWindowHandle, L"  Minecraft Redstone Design");
+		Sleep(200);
+		SetWindowText(MainWindowHandle, L"    Minecraft Redstone Desi");
+		Sleep(200);
+		SetWindowText(MainWindowHandle, L"     Minecraft Redstone Des");
+		Sleep(200);
+		SetWindowText(MainWindowHandle, L"      Minecraft Redstone De");
+		Sleep(200);
+		SetWindowText(MainWindowHandle, L"       Minecraft Redstone D");
+		Sleep(200);
+		SetWindowText(MainWindowHandle, L"        Minecraft Redstone ");
+		Sleep(200);
+		SetWindowText(MainWindowHandle, L"         Minecraft Redstone");
+		Sleep(200);
+		SetWindowText(MainWindowHandle, L"          Minecraft Redston");
+		Sleep(200);
+		SetWindowText(MainWindowHandle, L"r          Minecraft Redsto");
+		Sleep(200);
+		SetWindowText(MainWindowHandle, L"er          Minecraft Redst");
+		Sleep(200);
+		SetWindowText(MainWindowHandle, L"ner          Minecraft Reds");
+		Sleep(200);
+		SetWindowText(MainWindowHandle, L"gner          Minecraft Red");
+		Sleep(200);
+		SetWindowText(MainWindowHandle, L"igner          Minecraft Re");
+		Sleep(200);
+		SetWindowText(MainWindowHandle, L"signer          Minecraft R");
+		Sleep(200);
+		SetWindowText(MainWindowHandle, L"esigner          Minecraft ");
+		Sleep(200);
+		SetWindowText(MainWindowHandle, L"Designer          Minecraft");
+		Sleep(200);
+		SetWindowText(MainWindowHandle, L" Designer          Minecraf");
+		Sleep(200);
+		SetWindowText(MainWindowHandle, L"e Designer          Minecra");
+		Sleep(200);
+		SetWindowText(MainWindowHandle, L"ne Designer          Minecr");
+		Sleep(200);
+		SetWindowText(MainWindowHandle, L"one Designer          Minec");
+		Sleep(200);
+		SetWindowText(MainWindowHandle, L"tone Designer          Mine");
+		Sleep(200);
+		SetWindowText(MainWindowHandle, L"stone Designer          Min");
+		Sleep(200);
+		SetWindowText(MainWindowHandle, L"dstone Designer          Mi");
+		Sleep(200);
+		SetWindowText(MainWindowHandle, L"edstone Designer          M");
+		Sleep(200);
+		SetWindowText(MainWindowHandle, L"Redstone Designer");
+		Sleep(200);
+		SetWindowText(MainWindowHandle, L" Redstone Designer");
+		Sleep(200);
+		SetWindowText(MainWindowHandle, L"t Redstone Designer");
+		Sleep(200);
+		SetWindowText(MainWindowHandle, L"ft Redstone Designer");
+		Sleep(200);
+		SetWindowText(MainWindowHandle, L"aft Redstone Designer");
+		Sleep(200);
+		SetWindowText(MainWindowHandle, L"raft Redstone Designer");
+		Sleep(200);
+		SetWindowText(MainWindowHandle, L"craft Redstone Designer");
+		Sleep(200);
+		SetWindowText(MainWindowHandle, L"ecraft Redstone Designer");
+		Sleep(200);
+		SetWindowText(MainWindowHandle, L"necraft Redstone Designer");
+		Sleep(200);
+		SetWindowText(MainWindowHandle, L"inecraft Redstone Designer");
+		Sleep(200);
+	}
+	return 0;
+}
+
+DWORD WINAPI ShowUpdateAvailableTitleThreadProc(LPVOID lpParameter)
+{
+	while(true)
+	{
+		SetWindowText(MainWindowHandle, L"Minecraft Redstone Designer [Update Available]");
+		Sleep(1000);
+		SetWindowText(MainWindowHandle, L"Minecraft Redstone Designer");
+		Sleep(1000);
+	}
+	return 0;
+}
+
+DWORD WINAPI CheckUpdateAvailableFlagThreadProc(LPVOID lpParameter)
+{
+	if (IsUpdateAvailable())
+	{
+		ShowUpdateAvailableTitleThread = CreateThread(NULL, 0, ShowUpdateAvailableTitleThreadProc, NULL, NULL, NULL);
+		TerminateThread(UpdateMainWindowTitleThread, 0);
+	}
+	return 0;
+}
+
+DWORD WINAPI PlaySwitchStatusFromIndexToFileEditorAnimation(LPVOID lpParameter)
+{
+	RECT client_rect;
+	GetClientRect(MainWindowHandle, &client_rect);
+	HDC hdc = GetDC(MainWindowHandle);
+	unsigned char original_r = 178;
+	unsigned char original_g = 34;
+	unsigned char original_b = 34;
+	unsigned char target_r = 211;
+	unsigned char target_g = 211;
+	unsigned char target_b = 211;
+	for (; original_r < target_r; original_r++, original_g++, original_b++)
+	{
+		FillRect(hdc, &client_rect, CreateSolidBrush(RGB(original_r, original_g, original_b)));
+		Sleep(4);
+	}
+	for (; original_g < target_g; original_g++, original_b++)
+	{
+		FillRect(hdc, &client_rect, CreateSolidBrush(RGB(original_r, original_g, original_b)));
+		Sleep(4);
+	}
+	for (client_rect.top = client_rect.bottom - 1; client_rect.top > client_rect.bottom - 20; client_rect.top--)
+	{
+		FillRect(hdc, &client_rect, CreateSolidBrush(RGB(128, 128, 128)));
+		Sleep(20);
+	}
+	ReleaseDC(MainWindowHandle, hdc);
+	PlaySwitchStatusFromIndexToFileEditorAnimationThread = NULL;
+	SendMessageW(MainWindowHandle, WM_SET_DESCRIPTION_BAR, (WPARAM)L"No item selected.", NULL);
+	return 0;
+}
 
 DWORD WINAPI DrawBlocks(LPVOID lpParameter)
 {
@@ -89,6 +229,8 @@ DWORD WINAPI DrawBlocks(LPVOID lpParameter)
 		if (abs(itor->GetLocation().y - CurrentViewingLocation.y) <= block_count_can_display_y)
 			if (itor->GetLocation().y - CurrentViewingLocation.y < 0)
 				start_draw_location.y = block_count_can_display_y * BlockViewSize / 2 - BlockViewSize * abs(itor->GetLocation().y - CurrentViewingLocation.y);
+		parameters->render_target->FillRectangle(D2D1::Rect(start_draw_location.x, start_draw_location.y - BlockViewSize, start_draw_location.x + BlockViewSize, start_draw_location.y), parameters->block_border_brush);
+		parameters->render_target->FillRectangle(D2D1::Rect(start_draw_location.x + 1, start_draw_location.y - BlockViewSize + 1, start_draw_location.x + BlockViewSize - 1, start_draw_location.y - 1), parameters->block_border_brush);
 	}
 	return 0;
 }
@@ -113,32 +255,6 @@ DWORD WINAPI DrawRedstoneBlocks(LPVOID lpParameter)
 		parameters->render_target->DrawRectangle(D2D1::Rect(start_draw_location.x, start_draw_location.y, start_draw_location.x + BlockViewSize, start_draw_location.y + BlockViewSize), parameters->block_border_brush);
 	}
 	return 0;
-}
-
-LRESULT WINAPI AboutWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
-{
-	switch (uMsg)
-	{
-	case WM_PAINT:
-	{
-		PAINTSTRUCT ps;
-		HDC hdc = BeginPaint(hwnd, &ps);
-		HFONT title_font = _CreateFont(20, L"Unifont", false, false, false);
-		HFONT text_font = _CreateFont(15, L"Unifont", false, false, false);
-		SetBkMode(hdc, TRANSPARENT);
-		SetTextColor(hdc, RGB(255, 255, 255));
-		SelectObject(hdc, title_font);
-		TextOut(hdc, 5, 5, L"Redstone Designer", wcslen(L"Redstone Designer"));
-		SelectObject(hdc, text_font);
-		TextOut(hdc, 5, 40, L"Copyright(C)2020 CodesBuilder", wcslen(L"Copyright(C)2020 CodesBuilder"));
-		TextOut(hdc, 5, 65, L"Version:1.0.0 Inside Test 0", wcslen(L"Version:1.0.0 Inside Test 0"));
-		TextOut(hdc, 5, 90, L"This software is a free software.", wcslen(L"This software is a free software."));
-		DeleteObject(title_font);
-		DeleteObject(text_font);
-		break;
-	}
-	}
-	return DefWindowProc(hwnd, uMsg, wParam, lParam);
 }
 
 LRESULT WINAPI MainWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -167,7 +283,7 @@ LRESULT WINAPI MainWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 			break;
 		}
 		case MENU_BUTTON_CONTINUE_WITHOUT_ANY_OPERATION_INDEX:
-			SendMessage(hwnd, WM_SWITCH_STATUS, FILE_EDITORS, NULL);
+			SendMessage(hwnd, WM_SWITCH_STATUS, FILE_EDITOR, NULL);
 			RECT client_rect;
 			GetClientRect(hwnd, &client_rect);
 			InvalidateRect(hwnd, &client_rect, false);
@@ -178,36 +294,16 @@ LRESULT WINAPI MainWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 		case ID_FILE_OPEN:
 			SendMessage(hwnd, WM_COMMAND, MENU_BUTTON_OPEN_EXISTING_FILE_INDEX, NULL);
 			break;
-		case ID_HELP_ABOUT:
-		{
-			RECT window_rect;
-			GetWindowRect(hwnd, &window_rect);
-			WNDCLASS about_window_class;
-			HWND about_window_handle;
-			about_window_class = { 0 };
-			about_window_class.hCursor = LoadCursor(ApplicationInstance, IDC_ARROW);
-			about_window_class.lpszClassName = L"REDSTONE_DESIGNER_ABOUT_WINDOW";
-			about_window_class.hbrBackground = CreateSolidBrush(RGB(80, 80, 120));
-			about_window_class.hIcon = LoadIcon(ApplicationInstance, (LPCWSTR)IDI_LOGO);
-			about_window_class.hInstance = ApplicationInstance;
-			about_window_class.lpfnWndProc = AboutWindowProc;
-			if (RegisterClass(&about_window_class) == NULL)
-			{
-				MessageBox(MainWindowHandle, L"Create window class failed!", L"Error", MB_OK | MB_ICONERROR);
-				break;
-			}
-			about_window_handle = CreateWindow(L"REDSTONE_DESIGNER_ABOUT_WINDOW", L"About Redstone Designer", WS_OVERLAPPEDWINDOW & ~WS_SIZEBOX & ~WS_MAXIMIZEBOX & ~WS_MINIMIZEBOX, window_rect.right / 2, window_rect.bottom / 2, 500, 400, MainWindowHandle, NULL, ApplicationInstance, NULL);
-			if (about_window_handle == NULL)
-			{
-				MessageBox(about_window_handle, L"Create window failed!", L"Error", MB_OK | MB_ICONERROR);
-				break;
-			}
-			ShowWindow(about_window_handle,SW_SHOW);
-			WaitForSingleObject(about_window_handle, INFINITE);
-			UnregisterClass(L"REDSTONE_DESIGNER_ABOUT_WINDOW", ApplicationInstance);
-		}
 		}
 		break;
+	case WM_SET_DESCRIPTION_BAR:
+	{
+		RECT client_rect;
+		GetClientRect(hwnd, &client_rect);
+		MainWindowDescriptionBarText = (LPCWSTR)wParam;
+		InvalidateRect(hwnd, &client_rect, false);
+		break;
+	}
 	case WM_SWITCH_STATUS:
 		for (int i = 0; i < buttons.size(); i++)
 			DestroyWindow(buttons[i]);
@@ -228,28 +324,11 @@ LRESULT WINAPI MainWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 			CurrentMainWindowStatus = INDEX;
 			break;
 		}
-		case FILE_EDITORS:
+		case FILE_EDITOR:
 		{
-			RECT client_rect;
-			GetClientRect(hwnd, &client_rect);
-			HDC hdc = GetDC(hwnd);
-			unsigned char original_r = 178;
-			unsigned char original_g = 34;
-			unsigned char original_b = 34;
-			unsigned char target_r = 211;
-			unsigned char target_g = 211;
-			unsigned char target_b = 211;
-			for (; original_r < target_r; original_r++, original_g++, original_b++)
-			{
-				FillRect(hdc, &client_rect, CreateSolidBrush(RGB(original_r, original_g, original_b)));
-				Sleep(1);
-			}
-			for (; original_g < target_g; original_g++, original_b++)
-			{
-				FillRect(hdc, &client_rect, CreateSolidBrush(RGB(original_r, original_g, original_b)));
-				Sleep(1);
-			}
-			CurrentMainWindowStatus = FILE_EDITORS;
+			if (CurrentMainWindowStatus == INDEX)
+				PlaySwitchStatusFromIndexToFileEditorAnimationThread = CreateThread(NULL, 0, PlaySwitchStatusFromIndexToFileEditorAnimation, NULL, NULL, NULL);
+			CurrentMainWindowStatus = FILE_EDITOR;
 			break;
 		}
 		}
@@ -265,6 +344,7 @@ LRESULT WINAPI MainWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 		/* Prepares for paint process. */
 		RECT client_rect;
 		GetClientRect(hwnd, &client_rect);
+		/* Direct2D resources.*/
 		DirectXResource<ID2D1Factory*> factory;
 		DirectXResource<ID2D1HwndRenderTarget*> render_target;
 		DirectXResource<ID2D1SolidColorBrush*> background_brush;
@@ -343,7 +423,7 @@ LRESULT WINAPI MainWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 			render_target.GetResource()->DrawText(L"Redstone Designer", wcslen(L"Redstone Designer"), title_text_format.GetResource(), &D2D1::RectF(client_rect.left, client_rect.top, client_rect.right, client_rect.bottom), text_brush.GetResource(), D2D1_DRAW_TEXT_OPTIONS_NONE, DWRITE_MEASURING_MODE_NATURAL);
 			render_target.GetResource()->DrawText(L"\n\nChoose a option to continue:", wcslen(L"\n\nChoose a option to continue:"), normal_text_format.GetResource(), &D2D1::RectF(client_rect.left, client_rect.top, client_rect.right, client_rect.bottom), text_brush.GetResource(), D2D1_DRAW_TEXT_OPTIONS_NONE, DWRITE_MEASURING_MODE_NATURAL);
 			break;
-		case FILE_EDITORS:
+		case FILE_EDITOR:
 		{
 			if (CurrentEditingFileName.length() == 0)
 				break;
@@ -358,11 +438,20 @@ LRESULT WINAPI MainWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 			break;
 		}
 		}
+		if (CurrentMainWindowStatus != INDEX && PlaySwitchStatusFromIndexToFileEditorAnimationThread == NULL)
+			render_target.GetResource()->FillRectangle(D2D1::Rect(client_rect.left, client_rect.bottom - 20, client_rect.right, client_rect.bottom), block_border_brush.GetResource());
 		if (FAILED(render_target.GetResource()->EndDraw()))
 			if (MessageBox(hwnd, L"Draw failed!\n\nContinue?", L"Error", MB_YESNO | MB_ICONWARNING) == IDNO)
 			{
 				PostQuitMessage(1);
 			}
+		if (CurrentMainWindowStatus != INDEX && PlaySwitchStatusFromIndexToFileEditorAnimationThread == NULL)
+		{
+			HDC hdc = GetDC(hwnd);
+			SetBkMode(hdc, TRANSPARENT);
+			SetTextColor(hdc, RGB(255, 255, 255));
+			TextOut(hdc, client_rect.left, client_rect.bottom - 20, MainWindowDescriptionBarText.c_str(), wcslen(MainWindowDescriptionBarText.c_str()));
+		}
 		title_text_format.Release();
 		write_factory.Release();
 		render_target.Release();
@@ -381,23 +470,35 @@ LRESULT WINAPI MainWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 		break;
 	}
 	#ifdef ENABLE_TIME_CHECK
-	RECT client_rect;
-	GetClientRect(hwnd, &client_rect);
-	HDC hdc = GetDC(hwnd);
-	SetBkMode(hdc, TRANSPARENT);
-	SetTextColor(hdc, RGB(255, 255, 255));
-	TextOut(hdc, 0, client_rect.bottom - 30, L"Redstone Designer Codename 'Emerald'", wcslen(L"Redstone Designer Codename 'Emerald'"));
-	TextOut(hdc, 0, client_rect.bottom - 15, L"Evaluation Copy. Inside Test 0", wcslen(L"Evaluation Copy. Inside Test 0"));
+	if (PlaySwitchStatusFromIndexToFileEditorAnimationThread == NULL)
+	{
+		RECT client_rect;
+		GetClientRect(hwnd, &client_rect);
+		HDC hdc = GetDC(hwnd);
+		SetBkMode(hdc, TRANSPARENT);
+		SetTextColor(hdc, RGB(0, 0, 0));
+		if (CurrentMainWindowStatus == INDEX)
+		{
+			TextOut(hdc, 0, client_rect.bottom - 31, L"Redstone Designer Codename 'Emerald'", wcslen(L"Redstone Designer Codename 'Emerald'"));
+			TextOut(hdc, 0, client_rect.bottom - 16, L"For testing purposes only. Inside Test 0", wcslen(L"For testing purposes only. Inside Test 0"));
+			SetTextColor(hdc, RGB(255, 255, 255));
+			TextOut(hdc, 0, client_rect.bottom - 33, L"Redstone Designer Codename 'Emerald'", wcslen(L"Redstone Designer Codename 'Emerald'"));
+			TextOut(hdc, 0, client_rect.bottom - 18, L"For testing purposes only. Inside Test 0", wcslen(L"For testing purposes only. Inside Test 0"));
+		}
+		else
+		{
+			TextOut(hdc, 0, client_rect.bottom - 51, L"Redstone Designer Codename 'Emerald'", wcslen(L"Redstone Designer Codename 'Emerald'"));
+			TextOut(hdc, 0, client_rect.bottom - 36, L"For testing purposes only. Inside Test 0", wcslen(L"For testing purposes only. Inside Test 0"));
+			SetTextColor(hdc, RGB(255, 255, 255));
+			TextOut(hdc, 0, client_rect.bottom - 53, L"Redstone Designer Codename 'Emerald'", wcslen(L"Redstone Designer Codename 'Emerald'"));
+			TextOut(hdc, 0, client_rect.bottom - 38, L"For testing purposes only. Inside Test 0", wcslen(L"For testing purposes only. Inside Test 0"));
+		}
+		ReleaseDC(hwnd, hdc);
+	}
 	#endif
 	return DefWindowProc(hwnd, uMsg, wParam, lParam);
 }
-bool InitDirectX()
-{
-	//return false;
-CreateDirectXDevice:
 
-	return true;
-}
 void InitMainWindow(HINSTANCE hInstance)
 {
 	/* Register window class. */
@@ -415,11 +516,13 @@ void InitMainWindow(HINSTANCE hInstance)
 		MessageBox(NULL, L"Register Window Class Failed!", L"Error", MB_OK | MB_ICONERROR);
 		exit(1);
 	}
-	MainWindowHandle = CreateWindow(L"REDSTONE_DESIGNER", L"Minecraft Redstone Designer", WS_OVERLAPPEDWINDOW&~WS_SIZEBOX&~WS_MAXIMIZEBOX, CW_USEDEFAULT, CW_USEDEFAULT, 1024, 768, NULL, NULL, hInstance, NULL);
+	MainWindowHandle = CreateWindow(L"REDSTONE_DESIGNER", L"Minecraft Redstone Designer", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 1024, 768, NULL, NULL, hInstance, NULL);
 	ShowWindow(MainWindowHandle, SW_SHOW);
 	SendMessage(MainWindowHandle, WM_SWITCH_STATUS, (WPARAM)hInstance, NULL);
+	UpdateMainWindowTitleThread = CreateThread(NULL, 0, UpdateMainWindowTitleThreadProc, NULL, NULL, NULL);
+	CheckUpdateAvailableFlagThread = CreateThread(NULL, 0, CheckUpdateAvailableFlagThreadProc, NULL, NULL, NULL);
 }
-void DestroyMainWindow(HINSTANCE hInstance)
+void ApplicationDestructor(HINSTANCE hInstance)
 {
 	UnregisterClass(L"REDSTONE_DESIGNER", hInstance);
 }

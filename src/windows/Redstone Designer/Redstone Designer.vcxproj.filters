@@ -59,7 +59,7 @@
     <ClInclude Include="window.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="dllfuncs.hpp">
+    <ClInclude Include="update.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -75,6 +75,12 @@
     <Image Include="logo.ico">
       <Filter>资源文件</Filter>
     </Image>
+    <Image Include="redstone_tools.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="icon1.ico">
+      <Filter>资源文件</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <MASM Include="asmfuncs_x64.asm">
@@ -83,8 +89,10 @@
     <MASM Include="asmfuncs_x86.asm">
       <Filter>源文件</Filter>
     </MASM>
-    <MASM Include="asmfuncs.inc">
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="asmfuncs.inc">
       <Filter>头文件</Filter>
-    </MASM>
+    </None>
   </ItemGroup>
 </Project>
