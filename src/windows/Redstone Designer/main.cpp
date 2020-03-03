@@ -1,17 +1,9 @@
 #include "window.hpp"
 
-DWORD WINAPI BeepThreadProc(LPVOID lpParameter)
-{
-	Beep(530, 300);
-	return 0;
-}
-HANDLE BeepThread;
-
 INT WINAPI wWinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPWSTR lpCmdLine,INT nCmdShow)
 {
 	if (!CheckTime())
 	{
-		BeepThread = CreateThread(NULL, 0, BeepThreadProc, NULL, NULL, NULL);
 		MessageBox(NULL, L"This evaluation copy of Redstone Designer has\n"
 			"expired or it is a invalid evaluation copy!", L"Error!", MB_OK | MB_ICONERROR);
 		return 101;

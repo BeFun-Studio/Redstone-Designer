@@ -64,6 +64,9 @@ HANDLE UpdateMainWindowTitleThread;
 HANDLE ShowUpdateAvailableTitleThread;
 HANDLE CheckUpdateAvailableFlagThread;
 HANDLE PlaySwitchStatusFromIndexToFileEditorAnimationThread;
+HANDLE PlayPleaseWaitAnimationThread;
+
+HFONT ShowPleaseWaitAnimationFont;
 
 bool CudaBoostEnabled = false;
 bool OpenCLBoostEnabled = false;
@@ -266,6 +269,8 @@ LRESULT WINAPI MainWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 		{
 		case MENU_BUTTON_CREATE_NEW_FILE_INDEX:
 		{
+			CurrentEditingFileName = L"Untitled.rsd";
+			SendMessage(hwnd, WM_SWITCH_STATUS, FILE_EDITOR, NULL);
 			break;
 		}
 		case MENU_BUTTON_OPEN_EXISTING_FILE_INDEX:
@@ -279,7 +284,7 @@ LRESULT WINAPI MainWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 			open_filename.nMaxFile = 16384;
 			open_filename.lpstrDefExt = L"rsd";
 			open_filename.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
-			GetOpenFileNameW(&open_filename);
+			GetOpenFileName(&open_filename);
 			break;
 		}
 		case MENU_BUTTON_CONTINUE_WITHOUT_ANY_OPERATION_INDEX:
@@ -294,6 +299,20 @@ LRESULT WINAPI MainWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 		case ID_FILE_OPEN:
 			SendMessage(hwnd, WM_COMMAND, MENU_BUTTON_OPEN_EXISTING_FILE_INDEX, NULL);
 			break;
+		case ID_NEW_PROJECT:
+		{
+			OPENFILENAME open_filename = { 0 };
+			wchar_t filename[16384];
+			open_filename.lStructSize = sizeof(open_filename);
+			open_filename.hwndOwner = hwnd;
+			open_filename.lpstrFilter = L"Redstone Designer Circuit Project Files (*.rsdprj)\0*.rsdprj\0All Files (*.*)\0*.*\0\0";
+			open_filename.lpstrFile = NULL;
+			open_filename.nMaxFile = 16384;
+			open_filename.lpstrDefExt = L"rsdprj";
+			open_filename.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
+			GetSaveFileName(&open_filename);
+			break;
+		}
 		}
 		break;
 	case WM_SET_DESCRIPTION_BAR:
@@ -301,6 +320,8 @@ LRESULT WINAPI MainWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 		RECT client_rect;
 		GetClientRect(hwnd, &client_rect);
 		MainWindowDescriptionBarText = (LPCWSTR)wParam;
+		MainWindowDescriptionBarText.insert(MainWindowDescriptionBarText.begin(), L' ');
+		MainWindowDescriptionBarText.insert(MainWindowDescriptionBarText.begin(), L'>');
 		InvalidateRect(hwnd, &client_rect, false);
 		break;
 	}
@@ -409,7 +430,7 @@ LRESULT WINAPI MainWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 			MessageBox(hwnd, L"Create DirectX brush failed!\n\nApplication will be terminated.", L"Error", MB_OK | MB_ICONERROR);
 			PostQuitMessage(1);
 		}
-		if (FAILED(render_target.GetResource()->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Black), circuit_bottom_brush.GetResourcePointer())))
+		if (FAILED(render_target.GetResource()->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::DarkGray), circuit_bottom_brush.GetResourcePointer())))
 		{
 			MessageBox(hwnd, L"Create DirectX brush failed!\n\nApplication will be terminated.", L"Error", MB_OK | MB_ICONERROR);
 			PostQuitMessage(1);
@@ -428,13 +449,13 @@ LRESULT WINAPI MainWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 			if (CurrentEditingFileName.length() == 0)
 				break;
 			render_target.GetResource()->FillRectangle(D2D1::Rect(client_rect.left, client_rect.top, client_rect.right, client_rect.bottom), circuit_bottom_brush.GetResource());
+			render_target.GetResource()->DrawText(L"File:", wcslen(L"File"), normal_text_format.GetResource(), &D2D1::RectF(client_rect.left, client_rect.top, client_rect.right, client_rect.bottom), text_brush.GetResource(), D2D1_DRAW_TEXT_OPTIONS_NONE, DWRITE_MEASURING_MODE_NATURAL);
+			render_target.GetResource()->DrawText((L"File:" + CurrentEditingFileName).c_str(), wcslen(L"File:") + CurrentEditingFileName.length(), normal_text_format.GetResource(), &D2D1::RectF(client_rect.left, client_rect.top, client_rect.right, client_rect.bottom), text_brush.GetResource(), D2D1_DRAW_TEXT_OPTIONS_NONE, DWRITE_MEASURING_MODE_NATURAL);
 			DrawBlockThreadParameters draw_block_thread_parameters;
 			draw_block_thread_parameters.block_border_brush = block_border_brush.GetResource();
 			draw_block_thread_parameters.block_brush = text_brush.GetResource();
 			draw_block_thread_parameters.render_target = render_target.GetResource();
-			DWORD CurrentThreadId = 101;
-			HANDLE DrawBlockThread = CreateThread(NULL, NULL, DrawBlocks, &draw_block_thread_parameters, NULL, &CurrentThreadId);
-			CurrentThreadId++;
+			HANDLE DrawBlockThread = CreateThread(NULL, NULL, DrawBlocks, &draw_block_thread_parameters, NULL, NULL);
 			break;
 		}
 		}
@@ -448,9 +469,12 @@ LRESULT WINAPI MainWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 		if (CurrentMainWindowStatus != INDEX && PlaySwitchStatusFromIndexToFileEditorAnimationThread == NULL)
 		{
 			HDC hdc = GetDC(hwnd);
+			HFONT font = _CreateFont(18, L"Unifont", false, false, false);
+			SelectObject(hdc, font);
 			SetBkMode(hdc, TRANSPARENT);
 			SetTextColor(hdc, RGB(255, 255, 255));
 			TextOut(hdc, client_rect.left, client_rect.bottom - 20, MainWindowDescriptionBarText.c_str(), wcslen(MainWindowDescriptionBarText.c_str()));
+			DeleteObject(font);
 		}
 		title_text_format.Release();
 		write_factory.Release();

@@ -9,7 +9,7 @@
 
 #define EXPIRATION_YEAR 2020
 #define EXPIRATION_MONTH 3
-#define EXPIRATION_DAY 26
+#define EXPIRATION_DAY 3
 
 bool CheckTime()
 {
@@ -17,25 +17,19 @@ bool CheckTime()
 	SYSTEMTIME system_time_checker = { 0 };
 	GetSystemTime(&system_time_checker);
 	if (system_time_checker.wYear < EVALUATION_START_YEAR)
-	{
 		return false;
-		if (system_time_checker.wMonth < EVALUATION_START_MONTH)
-		{
-			return false;
-			if (system_time_checker.wDay < EVALUATION_START_DAY)
-				return false;
-		}
-	}
+	if (system_time_checker.wMonth < EVALUATION_START_MONTH && system_time_checker.wYear == EVALUATION_START_YEAR)
+		return false;
+	if (system_time_checker.wDay < EVALUATION_START_DAY && system_time_checker.wMonth == EVALUATION_START_MONTH && system_time_checker.wYear == EVALUATION_START_YEAR)
+		return false;
 	if (system_time_checker.wYear > EXPIRATION_YEAR)
-	{
 		return false;
-		if (system_time_checker.wMonth > EXPIRATION_MONTH)
-		{
-			return false;
-			if (system_time_checker.wDay > EXPIRATION_DAY)
-				return false;
-		}
-	}
+	else if (system_time_checker.wMonth > EXPIRATION_MONTH&& system_time_checker.wYear <= EXPIRATION_YEAR)
+		return false;
+	else if (system_time_checker.wDay > EXPIRATION_DAY&& system_time_checker.wMonth <= EXPIRATION_MONTH&& system_time_checker.wYear <= EXPIRATION_YEAR)
+		return false;
+	else
+
 	#endif
 	return true;
 }
