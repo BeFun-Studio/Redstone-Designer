@@ -26,11 +26,12 @@ struct CircuitLayer
 	list<CommandBlock>command_blocks;
 	list<TrapDoor>trap_doors;
 	list<Block>blocks;
+	list<Chest>chests;
 };
 struct ImporterGenericSegment
 {
-	wstring location_x;
-	wstring location_y;
+	wstring position_x;
+	wstring position_y;
 };
 
 struct ImporterRedstoneTorchSegment :public ImporterGenericSegment
@@ -74,22 +75,22 @@ bool ExportCircuitFile(LPCWSTR export_path)
 		{
 			fwprintf(fp, L"wires");
 			for (list<RedstoneWire>::iterator itor_redstone_wire = itor->wires.begin(); itor_redstone_wire != itor->wires.end(); itor_redstone_wire++)
-				fwprintf(fp, L",%d,%d", itor_redstone_wire->GetLocation().x, itor_redstone_wire->GetLocation().y);
+				fwprintf(fp, L",%d,%d", itor_redstone_wire->GetPosition().x, itor_redstone_wire->GetPosition().y);
 			fwprintf(fp, L";redstone_blocks");
 			for (list<RedstoneBlock>::iterator itor_redstone_block = itor->redstone_blocks.begin(); itor_redstone_block != itor->redstone_blocks.end(); itor_redstone_block++)
-				fwprintf(fp, L",%d,%d", itor_redstone_block->GetLocation().x, itor_redstone_block->GetLocation().y);
+				fwprintf(fp, L",%d,%d", itor_redstone_block->GetPosition().x, itor_redstone_block->GetPosition().y);
 			fwprintf(fp, L";redstone_torches");
 			for (list<RedstoneTorch>::iterator itor_redstone_torch = itor->redstone_torches.begin(); itor_redstone_torch != itor->redstone_torches.end(); itor_redstone_torch++)
-				fwprintf(fp, L",%d,%d,%d", itor_redstone_torch->GetLocation().x, itor_redstone_torch->GetLocation().y,itor_redstone_torch->GetDirection());
+				fwprintf(fp, L",%d,%d,%d", itor_redstone_torch->GetPosition().x, itor_redstone_torch->GetPosition().y,itor_redstone_torch->GetDirection());
 			fwprintf(fp, L";command_blocks");
 			for (list<CommandBlock>::iterator itor_command_block = itor->command_blocks.begin(); itor_command_block != itor->command_blocks.end(); itor_command_block++)
-				fwprintf(fp, L",%d,%d,%d,%d,%d,%ls,'%ls',%d", itor_command_block->GetLocation().x, itor_command_block->GetLocation().y,itor_command_block->IsConditional(),itor_command_block->IsKeepActive(),itor_command_block->GetCommandBlockType(),itor_command_block->GetCustomName(),itor_command_block->GetCommand(),itor_command_block->GetDirection());
+				fwprintf(fp, L",%d,%d,%d,%d,%d,%ls,'%ls',%d", itor_command_block->GetPosition().x, itor_command_block->GetPosition().y,itor_command_block->IsConditional(),itor_command_block->IsKeepActive(),itor_command_block->GetCommandBlockType(),itor_command_block->GetCustomName(),itor_command_block->GetCommand(),itor_command_block->GetDirection());
 			fwprintf(fp, L";trap_doors");
 			for (list<TrapDoor>::iterator itor_trap_door = itor->trap_doors.begin(); itor_trap_door != itor->trap_doors.end(); itor_trap_door++)
-				fwprintf(fp, L",%d,%d,%d", itor_trap_door->GetLocation().x,itor_trap_door->GetLocation().y,itor_trap_door->GetDirection());
+				fwprintf(fp, L",%d,%d,%d", itor_trap_door->GetPosition().x,itor_trap_door->GetPosition().y,itor_trap_door->GetDirection());
 			fwprintf(fp, L"blocks");
 			for (list<Block>::iterator itor_block = itor->blocks.begin(); itor_block != itor->blocks.end(); itor_block++)
-				fwprintf(fp, L",%d,%d,%d,%d", itor_block->GetLocation().x, itor_block->GetLocation().y, itor_block->GetBlockType(), itor_block->IsTransparent());
+				fwprintf(fp, L",%d,%d,%d,%d", itor_block->GetPosition().x, itor_block->GetPosition().y, itor_block->GetBlockType(), itor_block->IsTransparent());
 		}
 		fprintf(fp, ">");
 	}
@@ -228,14 +229,14 @@ int ImportCircuitFile(LPCWSTR import_path)
 					if (read_arguments == 0)
 					{
 						ImporterGenericSegment new_segment;
-						new_segment.location_x = args[i];
+						new_segment.position_x = args[i];
 						wire_segments.push_back(new_segment);
 						read_arguments++;
 					}
 					else
 					{
 						vector<ImporterGenericSegment>::iterator itor = wire_segments.end() - 1;
-						itor->location_y = args[i];
+						itor->position_y = args[i];
 						read_arguments--;
 						read_complete_segment = true;
 					}
@@ -243,14 +244,14 @@ int ImportCircuitFile(LPCWSTR import_path)
 					if (read_arguments == 0)
 					{
 						ImporterGenericSegment new_segment;
-						new_segment.location_x = args[i];
+						new_segment.position_x = args[i];
 						redstone_block_segments.push_back(new_segment);
 						read_arguments++;
 					}
 					else
 					{
 						vector<ImporterGenericSegment>::iterator itor = redstone_block_segments.end() - 1;
-						itor->location_y = args[i];
+						itor->position_y = args[i];
 						read_arguments--;
 						read_complete_segment = true;
 					}
@@ -260,7 +261,7 @@ int ImportCircuitFile(LPCWSTR import_path)
 					case 0:
 					{
 						ImporterRedstoneTorchSegment new_segment;
-						new_segment.location_x = args[i];
+						new_segment.position_x = args[i];
 						redstone_torch_segments.push_back(new_segment);
 						read_arguments++;
 						break;
@@ -268,7 +269,7 @@ int ImportCircuitFile(LPCWSTR import_path)
 					case 1:
 					{
 						vector<ImporterRedstoneTorchSegment>::iterator itor = redstone_torch_segments.end() - 1;
-						itor->location_y = args[i];
+						itor->position_y = args[i];
 						read_arguments++;
 						break;
 					}
@@ -287,7 +288,7 @@ int ImportCircuitFile(LPCWSTR import_path)
 					case 0:
 					{
 						ImporterCommandBlockSegment new_segment;
-						new_segment.location_x = args[i];
+						new_segment.position_x = args[i];
 						command_block_segments.push_back(new_segment);
 						read_arguments++;
 						break;
@@ -295,7 +296,7 @@ int ImportCircuitFile(LPCWSTR import_path)
 					case 1:
 					{
 						vector<ImporterCommandBlockSegment>::iterator itor = command_block_segments.end() - 1;
-						itor->location_y = args[i];
+						itor->position_y = args[i];
 						read_arguments++;
 						break;
 					}
@@ -348,7 +349,7 @@ int ImportCircuitFile(LPCWSTR import_path)
 					case 0:
 					{
 						ImporterTrapDoorSegment new_segment;
-						new_segment.location_x = args[i];
+						new_segment.position_x = args[i];
 						trap_door_segments.push_back(new_segment);
 						read_arguments++;
 						break;
@@ -356,7 +357,7 @@ int ImportCircuitFile(LPCWSTR import_path)
 					case 1:
 					{
 						vector<ImporterTrapDoorSegment>::iterator itor = trap_door_segments.end() - 1;
-						itor->location_y = args[i];
+						itor->position_y = args[i];
 						read_arguments++;
 						break;
 					}
@@ -375,7 +376,7 @@ int ImportCircuitFile(LPCWSTR import_path)
 					case 0:
 					{
 						ImporterBlockSegment new_segment;
-						new_segment.location_x = args[i];
+						new_segment.position_x = args[i];
 						block_segments.push_back(new_segment);
 						read_arguments++;
 						break;
@@ -383,7 +384,7 @@ int ImportCircuitFile(LPCWSTR import_path)
 					case 1:
 					{
 						vector<ImporterBlockSegment>::iterator itor=block_segments.end()-1;
-						itor->location_y = args[i];
+						itor->position_y = args[i];
 						read_arguments++;
 						break;
 					}
@@ -411,12 +412,12 @@ int ImportCircuitFile(LPCWSTR import_path)
 			RedstoneWire wire;
 			wstringstream ss;
 			int x, y;
-			ss << wire_segments[i].location_x.c_str();
+			ss << wire_segments[i].position_x.c_str();
 			ss >> x;
-			ss << wire_segments[i].location_y.c_str();
+			ss << wire_segments[i].position_y.c_str();
 			ss >> y;
-			Location location = { x,y };
-			wire.SetLocation(location);
+			Position position = { x,y };
+			wire.SetPosition(position);
 			current_layer.wires.push_back(wire);
 		}
 		for (int i = 0; i < redstone_block_segments.size(); i++)
@@ -424,12 +425,12 @@ int ImportCircuitFile(LPCWSTR import_path)
 			RedstoneBlock redstone_block;
 			wstringstream ss;
 			int x, y;
-			ss << wire_segments[i].location_x.c_str();
+			ss << wire_segments[i].position_x.c_str();
 			ss >> x;
-			ss << wire_segments[i].location_y.c_str();
+			ss << wire_segments[i].position_y.c_str();
 			ss >> y;
-			Location location = { x,y };
-			redstone_block.SetLocation(location);
+			Position position = { x,y };
+			redstone_block.SetPosition(position);
 			current_layer.redstone_blocks.push_back(redstone_block);
 		}
 		for (int i = 0; i < redstone_torch_segments.size(); i++)
@@ -438,14 +439,14 @@ int ImportCircuitFile(LPCWSTR import_path)
 			wstringstream ss;
 			int x, y;
 			int direction;
-			ss << redstone_torch_segments[i].location_x.c_str();
+			ss << redstone_torch_segments[i].position_x.c_str();
 			ss >> x;
-			ss << redstone_torch_segments[i].location_y;
+			ss << redstone_torch_segments[i].position_y;
 			ss >> y;
 			ss << redstone_torch_segments[i].direction;
 			ss >> direction;
-			Location location = { x,y };
-			redstone_torch.SetLocation(location);
+			Position position = { x,y };
+			redstone_torch.SetPosition(position);
 			redstone_torch.SetDirection((Direction)direction);
 			current_layer.redstone_torches.push_back(redstone_torch);
 		}
@@ -456,9 +457,9 @@ int ImportCircuitFile(LPCWSTR import_path)
 			int x, y, command_block_type,direction;
 			bool conditional, keep_active;
 			LPCWSTR custom_name, command;
-			ss << command_block_segments[i].location_x.c_str();
+			ss << command_block_segments[i].position_x.c_str();
 			ss >> x;
-			ss << command_block_segments[i].location_y.c_str();
+			ss << command_block_segments[i].position_y.c_str();
 			ss >> y;
 			ss << command_block_segments[i].block_type.c_str();
 			ss >> command_block_type;
@@ -470,8 +471,8 @@ int ImportCircuitFile(LPCWSTR import_path)
 			command = command_block_segments[i].command.c_str();
 			ss << command_block_segments[i].direction.c_str();
 			ss >> direction;
-			Location location = { x,y };
-			command_block.SetLocation(location);
+			Position position = { x,y };
+			command_block.SetPosition(position);
 			command_block.SetCommandBlockType((CommandBlockType)command_block_type);
 			command_block.SetConditional(conditional);
 			command_block.SetDirection((Direction)direction);
@@ -485,14 +486,14 @@ int ImportCircuitFile(LPCWSTR import_path)
 			TrapDoor trap_door;
 			wstringstream ss;
 			int x, y, direction;
-			ss << trap_door_segments[i].location_x.c_str();
+			ss << trap_door_segments[i].position_x.c_str();
 			ss >> x;
-			ss << trap_door_segments[i].location_y.c_str();
+			ss << trap_door_segments[i].position_y.c_str();
 			ss >> y;
 			ss << trap_door_segments[i].direction.c_str();
 			ss >> direction;
-			Location location={ x,y };
-			trap_door.SetLocation(location);
+			Position position={ x,y };
+			trap_door.SetPosition(position);
 			trap_door.SetDirection((Direction)direction);
 			current_layer.trap_doors.push_back(trap_door);
 		}
@@ -502,16 +503,16 @@ int ImportCircuitFile(LPCWSTR import_path)
 			wstringstream ss;
 			int x, y, block_type;
 			bool transparent;
-			ss << block_segments[i].location_x.c_str();
+			ss << block_segments[i].position_x.c_str();
 			ss >> x;
-			ss << block_segments[i].location_y.c_str();
+			ss << block_segments[i].position_y.c_str();
 			ss >> y;
 			ss << block_segments[i].block_type;
 			ss >> block_type;
 			ss << block_segments[i].transparent;
 			ss >> transparent;
-			Location location = { x,y };
-			block.SetLocation(location);
+			Position position = { x,y };
+			block.SetPosition(position);
 			block.SetBlockType((BlockType)block_type);
 			block.SetTransparent(transparent);
 			current_layer.blocks.push_back(block);

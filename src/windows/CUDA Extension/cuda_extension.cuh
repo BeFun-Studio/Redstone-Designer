@@ -14,7 +14,7 @@
 
 typedef enum
 {
-	INIT_SUCCESSFULLY,
+	INIT_SUCCESSFULLY=0,
 	NO_DEVICE,
 	GET_DEVICE_PROPERTIES_FAILED,
 	NO_DEVICE_SUPPORTED_LOWEST_VERSION_CUDA,
@@ -27,10 +27,10 @@ extern "C" {
 
 DLLAPI __global__ bool SetCudaDevice(int device_id);
 DLLAPI __global__ INIT_CUDA_RETURN_VALUES InitializationCuda();
-DLLAPI __global__ long long CudaAdd(unsigned short count, ...);
-DLLAPI __global__ long long CudaSubtract(unsigned short count, long long original_num, ...);
-DLLAPI __global__ long long CudaMultiply(unsigned short count, ...);
-DLLAPI __global__ long long CudaDivide(unsigned short count, long long original_num, ...);
+DLLAPI __device__ long long CudaAdd(unsigned short count, ...);
+DLLAPI __device__ long long CudaSubtract(unsigned short count, long long original_num, ...);
+DLLAPI __device__ long long CudaMultiply(unsigned short count, ...);
+DLLAPI __device__ long long CudaDivide(unsigned short count, long long original_num, ...);
 
 #ifdef __cplusplus
 }

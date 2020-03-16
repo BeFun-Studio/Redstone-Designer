@@ -9,7 +9,7 @@
 
 #define EXPIRATION_YEAR 2020
 #define EXPIRATION_MONTH 3
-#define EXPIRATION_DAY 3
+#define EXPIRATION_DAY 20
 
 bool CheckTime()
 {
@@ -28,8 +28,6 @@ bool CheckTime()
 		return false;
 	else if (system_time_checker.wDay > EXPIRATION_DAY&& system_time_checker.wMonth <= EXPIRATION_MONTH&& system_time_checker.wYear <= EXPIRATION_YEAR)
 		return false;
-	else
-
 	#endif
 	return true;
 }

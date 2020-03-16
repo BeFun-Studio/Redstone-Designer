@@ -5,13 +5,10 @@ VisualStudioVersion = 16.0.29613.14
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Redstone Designer", "Redstone Designer\Redstone Designer.vcxproj", "{B08F75AB-B384-484B-9CA4-CE0CB6E3934A}"
 	ProjectSection(ProjectDependencies) = postProject
-		{34EC7035-76D4-4813-A0DC-FCEF46845D5D} = {34EC7035-76D4-4813-A0DC-FCEF46845D5D}
 		{74FDC089-6E66-49ED-BC80-77E572C5D7A3} = {74FDC089-6E66-49ED-BC80-77E572C5D7A3}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CUDA Extension", "CUDA Extension\CUDA Extension.vcxproj", "{74FDC089-6E66-49ED-BC80-77E572C5D7A3}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UI Extension", "UI Extension\UI Extension.vcxproj", "{34EC7035-76D4-4813-A0DC-FCEF46845D5D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -43,16 +40,6 @@ Global
 		{74FDC089-6E66-49ED-BC80-77E572C5D7A3}.Release|x64.Build.0 = Release|x64
 		{74FDC089-6E66-49ED-BC80-77E572C5D7A3}.Release|x86.ActiveCfg = Release|Win32
 		{74FDC089-6E66-49ED-BC80-77E572C5D7A3}.Release|x86.Build.0 = Release|Win32
-		{34EC7035-76D4-4813-A0DC-FCEF46845D5D}.Debug|Any CPU.ActiveCfg = Debug|Win32
-		{34EC7035-76D4-4813-A0DC-FCEF46845D5D}.Debug|x64.ActiveCfg = Debug|x64
-		{34EC7035-76D4-4813-A0DC-FCEF46845D5D}.Debug|x64.Build.0 = Debug|x64
-		{34EC7035-76D4-4813-A0DC-FCEF46845D5D}.Debug|x86.ActiveCfg = Debug|Win32
-		{34EC7035-76D4-4813-A0DC-FCEF46845D5D}.Debug|x86.Build.0 = Debug|Win32
-		{34EC7035-76D4-4813-A0DC-FCEF46845D5D}.Release|Any CPU.ActiveCfg = Release|Win32
-		{34EC7035-76D4-4813-A0DC-FCEF46845D5D}.Release|x64.ActiveCfg = Release|x64
-		{34EC7035-76D4-4813-A0DC-FCEF46845D5D}.Release|x64.Build.0 = Release|x64
-		{34EC7035-76D4-4813-A0DC-FCEF46845D5D}.Release|x86.ActiveCfg = Release|Win32
-		{34EC7035-76D4-4813-A0DC-FCEF46845D5D}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

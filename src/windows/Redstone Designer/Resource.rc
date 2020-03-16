@@ -66,31 +66,45 @@ IDR_MENU MENU
 BEGIN
     POPUP "File(&F)"
     BEGIN
-        POPUP "New(&N)"
+        POPUP "New(Ctrl+&N)"
         BEGIN
             MENUITEM "Circuit File(&C)...",         ID_NEW_CIRCUITFILE
             MENUITEM "Project(&P)...",              ID_NEW_PROJECT
         END
-        MENUITEM "Open(&O)...",                 ID_FILE_OPEN
-        MENUITEM "Import(I)...",                ID_FILE_IMPORT
+        MENUITEM "Open(Ctrl+&O)...",            ID_FILE_OPEN
+        MENUITEM "Close(Ctrl+&L)",              ID_FILE_CLOSE
+        MENUITEM "Import(Ctrl+&I)...",          ID_FILE_IMPORT
+        MENUITEM "Export(Ctrl+E)...",           ID_FILE_EXPORT
+        MENUITEM SEPARATOR
+        MENUITEM "Save(Ctrl+&S)",               ID_FILE_SAVE
+        MENUITEM "Save As(&F)...",              ID_FILE_SAVEAS
+        MENUITEM "Discard(Ctrl+&D)",            ID_FILE_DISCARD
+        MENUITEM "Rename(Ctrl+&R)",             ID_FILE_RENAME
     END
     POPUP "Edit(&E)"
     BEGIN
-        MENUITEM "Copy(&C)",                    ID_EDIT_COPY
-        MENUITEM "Cut(&X)",                     ID_EDIT_CUT
-        MENUITEM "Paste(&V)",                   ID_EDIT_PASTE
-        MENUITEM "Undo(&Z)",                    ID_EDIT_UNDO
-        MENUITEM "Redo(&Y)",                    ID_EDIT_REDO
+        MENUITEM "Copy(Ctrl+&C)",               ID_EDIT_COPY
+        MENUITEM "Cut(Ctrl+&X)",                ID_EDIT_CUT
+        MENUITEM "Paste(Ctrl+&V)",              ID_EDIT_PASTE
+        MENUITEM "Undo(Ctrl+&Z)",               ID_EDIT_UNDO
+        MENUITEM "Redo(Ctrl+&Y)",               ID_EDIT_REDO
         MENUITEM "Select(&S)",                  ID_EDIT_SELECT
-        MENUITEM "Select All(&A)",              ID_EDIT_SELECTALL
-        MENUITEM "Unselect(&U)",                ID_EDIT_UNSELECT
-        MENUITEM "Unselect All(&I)",            ID_EDIT_UNSELECTALL
+        MENUITEM "Select All(Ctrl+&A)",         ID_EDIT_SELECTALL
+        MENUITEM "Unselect(Ctrl+&U)",           ID_EDIT_UNSELECT
+        MENUITEM "Unselect All(Ctrl+&O)",       ID_EDIT_UNSELECTALL
         MENUITEM "Move(&M)",                    ID_EDIT_MOVE
+        MENUITEM "Delete(Ctrl+&D)",             ID_EDIT_DELETE
+        MENUITEM "Properties(Ctrl+&P)...",      ID_EDIT_PROPERTIES
     END
     POPUP "View(&V)"
     BEGIN
-        MENUITEM "Move(&M)",                    ID_VIEW_MOVE
-        MENUITEM "Move To(T)...",               ID_VIEW_MOVETO
+        MENUITEM "Move(Ctrl+&M)",               ID_VIEW_MOVE
+        MENUITEM "Move To(Ctrl+&T)...",         ID_VIEW_MOVETO
+        POPUP "Hide(Ctrl+&H)..."
+        BEGIN
+            MENUITEM "Blocks(&B)",                  ID_HIDE_BLOCKS, CHECKED
+            MENUITEM "Components(&C)",              ID_HIDE_COMPENTMENTS, CHECKED
+        END
     END
     POPUP "Place(&P)"
     BEGIN
@@ -99,10 +113,14 @@ BEGIN
     END
     POPUP "Tools(&T)"
     BEGIN
-        MENUITEM "",                            ID_Menu
+        MENUITEM "Generate a New Connection(&C)...", ID_Menu
     END
     POPUP "Help(&H)"
     BEGIN
+        MENUITEM "Check Update(&U)...",         ID_HELP_CHECKUPDATE
+        MENUITEM "View Help Documents(&H)...",  ID_HELP_VIEWHELPDOCUMENTS
+        MENUITEM "Settings(&S)...",             ID_HELP_SETTINGS
+        MENUITEM SEPARATOR
         MENUITEM "About...(&A)",                ID_HELP_ABOUT
     END
 END
@@ -145,6 +163,16 @@ BEGIN
         VALUE "Translation", 0x0, 1200
     END
 END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Cursor
+//
+
+IDC_INDICATOR_LIGHT     CURSOR                  "indicator_light.cur"
+
+IDC_INDICATOR_DARK      CURSOR                  "indicator_dark.cur"
 
 #endif    // 中文(简体，中国) resources
 /////////////////////////////////////////////////////////////////////////////

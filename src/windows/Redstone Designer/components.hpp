@@ -10,7 +10,36 @@ enum CommandBlockType
 	REPEAT_COMMAND_BLOCK
 };
 
-class CommandBlock
+class Component
+{
+protected:
+	Position position;
+	wstring comment;
+public:
+	Position GetPosition()
+	{
+		return this->position;
+	}
+	void SetPosition(Position position)
+	{
+		this->position = position;
+	}
+	void SetPosition(int x, int y)
+	{
+		this->position.x = x;
+		this->position.y = y;
+	}
+	void SetComment(LPCWSTR comment)
+	{
+		this->comment = comment;
+	}
+	LPCWSTR GetComment()
+	{
+		return this->comment.c_str();
+	}
+};
+
+class CommandBlock :public Component
 {
 private:
 	wstring storaged_command;
@@ -19,7 +48,6 @@ private:
 	Direction direction;
 	bool keep_active;
 	wstring custom_name;
-	Location location;
 public:
 	CommandBlock()
 	{
@@ -30,24 +58,24 @@ public:
 		this->keep_active = false;
 		this->custom_name = L"";
 	}
-	CommandBlock(LPCWSTR initial_command,CommandBlockType command_block_type,bool _conditional,bool _keep_active,LPCWSTR _custom_name,Location _location)
+	CommandBlock(LPCWSTR initial_command, CommandBlockType command_block_type, bool _conditional, bool _keep_active, LPCWSTR _custom_name, Position _position)
 	{
 		this->storaged_command = initial_command;
 		this->type = command_block_type;
 		this->conditional = _conditional;
 		this->keep_active = _keep_active;
 		this->custom_name = _custom_name;
-		this->location = _location;
+		this->position = _position;
 	}
-	CommandBlock(LPCWSTR initial_command, CommandBlockType command_block_type, bool _conditional, bool _keep_active, LPCWSTR _custom_name, int location_x, int location_y)
+	CommandBlock(LPCWSTR initial_command, CommandBlockType command_block_type, bool _conditional, bool _keep_active, LPCWSTR _custom_name, int position_x, int position_y)
 	{
 		this->storaged_command = initial_command;
 		this->type = command_block_type;
 		this->conditional = _conditional;
 		this->keep_active = _keep_active;
 		this->custom_name = _custom_name;
-		this->location.x = location_x;
-		this->location.y = location_y;
+		this->position.x = position_x;
+		this->position.y = position_y;
 	}
 	LPCWSTR GetCommand()
 	{
@@ -69,10 +97,6 @@ public:
 	{
 		return this->custom_name.c_str();
 	}
-	Location GetLocation()
-	{
-		return this->location;
-	}
 	void SetCommand(LPCWSTR command)
 	{
 		this->storaged_command = command;
@@ -93,15 +117,6 @@ public:
 	{
 		this->custom_name = _custom_name;
 	}
-	void SetLocation(Location _location)
-	{
-		this->location = _location;
-	}
-	void SetLocation(int location_x, int location_y)
-	{
-		this->location.x = location_x;
-		this->location.y = location_y;
-	}
 	void SetDirection(Direction _direction)
 	{
 		this->direction = _direction;
@@ -111,84 +126,44 @@ public:
 		return this->direction;
 	}
 };
-class RedstoneWire
+class RedstoneWire :public Component
 {
-private:
-	Location location;
 public:
 	RedstoneWire()
 	{
-		this->location = { 0,0 };
+		this->position = { 0,0 };
 	}
-	RedstoneWire(Location _location)
+	RedstoneWire(Position _position)
 	{
-		this->location = _location;
-	}
-	void SetLocation(Location _location)
-	{
-		this->location = _location;
-	}
-	void SetLocation(int location_x, int location_y)
-	{
-		this->location.x = location_x;
-		this->location.y = location_y;
-	}
-	Location GetLocation()
-	{
-		return this->location;
+		this->position = _position;
 	}
 };
-class RedstoneBlock
+class RedstoneBlock :public Component
 {
-private:
-	Location location;
 public:
 	RedstoneBlock()
 	{
-		this->location = { 0,0 };
+		this->position = { 0,0 };
 	}
-	RedstoneBlock(Location _location)
+	RedstoneBlock(Position _position)
 	{
-		this->location = _location;
-	}
-	void SetLocation(Location _location)
-	{
-		this->location = _location;
-	}
-	void SetLocation(int location_x, int location_y)
-	{
-		this->location.x = location_x;
-		this->location.y = location_y;
-	}
-	Location GetLocation()
-	{
-		return this->location;
+		this->position = _position;
 	}
 };
-class RedstoneTorch
+class RedstoneTorch :public Component
 {
 private:
-	Location location;
 	Direction direction;
 public:
 	RedstoneTorch()
 	{
-		this->location = { 0,0 };
+		this->position = { 0,0 };
 		this->direction = UP;
 	}
-	RedstoneTorch(Location _location,Direction _direction)
+	RedstoneTorch(Position _position,Direction _direction)
 	{
-		this->location = _location;
+		this->position = _position;
 		this->direction = _direction;
-	}
-	void SetLocation(Location _location)
-	{
-		this->location = _location;
-	}
-	void SetLocation(int location_x, int location_y)
-	{
-		this->location.x = location_x;
-		this->location.y = location_y;
 	}
 	bool SetDirection(Direction _direction)
 	{
@@ -197,29 +172,24 @@ public:
 		this->direction = _direction;
 		return true;
 	}
-	Location GetLocation()
-	{
-		return this->location;
-	}
 	Direction GetDirection()
 	{
 		return this->direction;
 	}
 };
-class TrapDoor
+class TrapDoor :public Component
 {
 private:
-	Location location;
 	Direction direction;
 public:
 	TrapDoor()
 	{
-		this->location = { 0,0 };
+		this->position = { 0,0 };
 		this->direction = NORTH;
 	}
-	TrapDoor(Location _location, Direction _direction)
+	TrapDoor(Position _position, Direction _direction)
 	{
-		this->location = _location;
+		this->position = _position;
 		if (direction == UP || direction == DOWN)
 		{
 			throw InvalidDirection();
@@ -227,25 +197,16 @@ public:
 		}
 		this->direction = _direction;
 	}
-	TrapDoor(int location_x, int location_y, Direction _direction)
+	TrapDoor(int position_x, int position_y, Direction _direction)
 	{
-		this->location.x = location_x;
-		this->location.y = location_y;
+		this->position.x = position_x;
+		this->position.y = position_y;
 		if (direction == UP || direction == DOWN)
 		{
 			throw InvalidDirection();
 			this->direction = NORTH;
 		}
 		this->direction = _direction;
-	}
-	void SetLocation(Location _location)
-	{
-		this->location = _location;
-	}
-	void SetLocation(int location_x, int location_y)
-	{
-		this->location.x = location_x;
-		this->location.y = location_y;
 	}
 	bool SetDirection(Direction _direction)
 	{
@@ -253,12 +214,45 @@ public:
 			return false;
 		this->direction = _direction;
 	}
-	Location GetLocation()
+	Direction GetDirection()
 	{
-		return this->location;
+		return this->direction;
+	}
+};
+
+class Chest :public Component
+{
+protected:
+	Direction direction;
+public:
+	Chest()
+	{
+		this->position = { 0,0 };
+		this->direction = NORTH;
+	}
+	Chest(Position _position, Direction _direction)
+	{
+		this->position = _position;
+		this->direction = _direction;
+	}
+	Chest(int position_x, int position_y, Direction _direction)
+	{
+		this->position.x = position_x;
+		this->position.y = position_y;
+		this->direction = _direction;
+	}
+	bool SetDirection(Direction _direction)
+	{
+		if (_direction == UP || _direction == DOWN)
+			return false;
+		this->direction = _direction;
 	}
 	Direction GetDirection()
 	{
 		return this->direction;
 	}
+};
+
+class TrapChest :public Chest
+{
 };

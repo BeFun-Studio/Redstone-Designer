@@ -15,7 +15,7 @@ DLLAPI __global__ INIT_CUDA_RETURN_VALUES InitializationCuda()
 	cudaGetDeviceCount(&cuda_device_count);
 	if (cuda_device_count == 0)
 		return NO_DEVICE;
-	int j = 0;
+	bool device_select_successfully;
 	for (int i = 0; i < cuda_device_count; i++)
 	{
 		cudaDeviceProp current_device_properties;
@@ -25,13 +25,18 @@ DLLAPI __global__ INIT_CUDA_RETURN_VALUES InitializationCuda()
 			if (current_device_properties.major > 3)
 				if (!SetCudaDevice(i))
 					return SET_DEVICE_FAILED;
+				else
+				{
+					device_select_successfully = true;
+					break;
+				}
 	}
-	if ( j == 0)
+	if (!device_select_successfully)
 		return NO_DEVICE_SUPPORTED_LOWEST_VERSION_CUDA;
 	return INIT_SUCCESSFULLY;
 }
 
-DLLAPI __global__ long long CudaAdd(unsigned short count, ...)
+DLLAPI __device__ long long CudaAdd(unsigned short count, ...)
 {
 	va_list args;
 	va_start(args, count);
@@ -41,7 +46,7 @@ DLLAPI __global__ long long CudaAdd(unsigned short count, ...)
 	return result;
 }
 
-DLLAPI __global__ long long CudaSubtract(unsigned short count, long long original_num, ...)
+DLLAPI __device__ long long CudaSubtract(unsigned short count, long long original_num, ...)
 {
 	va_list args;
 	va_start(args, count);
@@ -51,7 +56,7 @@ DLLAPI __global__ long long CudaSubtract(unsigned short count, long long origina
 	return result;
 }
 
-DLLAPI __global__ long long CudaMultiply(unsigned short count, ...)
+DLLAPI __device__ long long CudaMultiply(unsigned short count, ...)
 {
 	va_list args;
 	va_start(args, count);
@@ -61,7 +66,7 @@ DLLAPI __global__ long long CudaMultiply(unsigned short count, ...)
 	return result;
 }
 
-DLLAPI __global__ long long CudaDivide(unsigned short count, long long original_num, ...)
+DLLAPI __device__ long long CudaDivide(unsigned short count, long long original_num, ...)
 {
 	va_list args;
 	va_start(args, count);

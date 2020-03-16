@@ -9,7 +9,7 @@ enum Direction
 	UP,
 	DOWN
 };
-struct Location
+struct Position
 {
 	int x;
 	int y;

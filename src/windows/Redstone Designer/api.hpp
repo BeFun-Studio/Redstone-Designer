@@ -10,37 +10,6 @@
 #define HIDWORD(l) ((DWORD)((((DWORD_PTR)(l)) >> 32) & 0xffffffff))
 #define CPU_THREAD_COUNT GetCpuThreadCount()
 
-template<class type>class DirectXResource
-{
-private:
-    type resource; 
-public:
-    DirectXResource()
-    {
-        this->resource = NULL;
-    }
-    DirectXResource(type res)
-    {
-        this->resource = res;
-    }
-    type GetResource()
-    {
-        return this->resource;
-    }
-    type* GetResourcePointer()
-    {
-        return &(this->resource);
-    }
-    void Release()
-    {
-        RELEASE_DIRECTX_RESOURCE(this->resource);
-    }
-    ~DirectXResource()
-    {
-        this->Release();
-    }
-};
-
 struct BeepCommand
 {
     bool beep;

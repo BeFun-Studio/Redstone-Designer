@@ -22,15 +22,15 @@ class Block
 private:
 	bool transparent;
 	BlockType type;
-	Location location;
+	Position position;
 public:
 	Block()
 	{
 		this->transparent = false;
-		this->location = { 0,0 };
+		this->position = { 0,0 };
 		this->type = COMPLETE_BLOCK;
 	}
-	Block(bool is_transparent, BlockType block_type, Location _location)
+	Block(bool is_transparent, BlockType block_type, Position _position)
 	{
 		if (is_transparent && block_type != COMPLETE_BLOCK && block_type != SLAB_UPPER && block_type != STAIR_UPPER_NORTH && block_type != STAIR_UPPER_SOUTH && block_type != STAIR_UPPER_WEST && block_type != STAIR_UPPER_EAST)
 		{
@@ -45,9 +45,9 @@ public:
 		else
 			this->transparent = true;
 		this->type = block_type;
-		this->location = _location;
+		this->position = _position;
 	}
-	Block(bool is_transparent, BlockType block_type, int location_x, int location_y)
+	Block(bool is_transparent, BlockType block_type, int position_x, int position_y)
 	{
 		if (is_transparent && block_type != COMPLETE_BLOCK)
 		{
@@ -58,8 +58,8 @@ public:
 			this->transparent = true;
 		this->transparent = is_transparent;
 		this->type = block_type;
-		this->location.x = location_x;
-		this->location.y = location_y;
+		this->position.x = position_x;
+		this->position.y = position_y;
 	}
 	bool SetTransparent(bool is_transparent)
 	{
@@ -81,21 +81,21 @@ public:
 		else
 			this->transparent = true;
 	}
-	void SetLocation(Location _location)
+	void SetPosition(Position _position)
 	{
-		this->location = _location;
+		this->position = _position;
 	}
-	void SetLocation(int location_x, int location_y)
+	void SetPosition(int position_x, int position_y)
 	{
-		this->location.x = location_x;
-		this->location.y = location_y;
+		this->position.x = position_x;
+		this->position.y = position_y;
 	}
 	BlockType GetBlockType()
 	{
 		return this->type;
 	}
-	Location GetLocation()
+	Position GetPosition()
 	{
-		return this->location;
+		return this->position;
 	}
 };
