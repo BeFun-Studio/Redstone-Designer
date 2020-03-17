@@ -14,6 +14,11 @@ struct Position
 	int x;
 	int y;
 };
+struct Step
+{
+	Position current_pos;
+	unsigned int step;
+};
 class InvalidDirection
 {
 };

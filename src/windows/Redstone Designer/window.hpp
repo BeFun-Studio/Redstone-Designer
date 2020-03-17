@@ -95,8 +95,8 @@ HANDLE DrawRedstoneBlocksThread;
 HFONT ShowPleaseWaitAnimationFont;
 const HFONT ControlFont = _CreateFont(18, L"Unifont", false, false, false);
 
-bool CudaBoostEnabled = false;
-bool OpenCLBoostEnabled = false;
+bool CudaSpeedupEnabled = false;
+bool OpenCLSpeedupEnabled = false;
 
 bool UserSpecifiedApplicationExit = false;
 
@@ -308,19 +308,19 @@ LRESULT WINAPI AboutWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 		draw_rect.right -= 5;
 		FillRect(hdc, &draw_rect, CreateSolidBrush(RGB(0, 0, 0)));
 		SetTextColor(hdc, RGB(100, 150, 100));
-		if (CudaBoostEnabled)
-			TextOut(hdc, 5, 60, L"CUDA Boost:Enabled", wcslen(L"CUDA Boost:Enabled"));
+		if (CudaSpeedupEnabled)
+			TextOut(hdc, 5, 60, L"CUDA Speedup:Enabled", wcslen(L"CUDA Speedup:Enabled"));
 		else
-			TextOut(hdc, 5, 60, L"CUDA Boost:Disabled", wcslen(L"CUDA Boost:Disabled"));
+			TextOut(hdc, 5, 60, L"CUDA Speedup:Disabled", wcslen(L"CUDA Speedup:Disabled"));
 		SetTextColor(hdc, RGB(178,34,34));
-		if (OpenCLBoostEnabled)
-			TextOut(hdc, 5, 85, L"OpenCL Boost:Enabled", wcslen(L"OpenCL Boost:Enabled"));
+		if (OpenCLSpeedupEnabled)
+			TextOut(hdc, 5, 85, L"OpenCL Speedup:Enabled", wcslen(L"OpenCL Speedup:Enabled"));
 		else
-			TextOut(hdc, 5, 85, L"OpenCL Boost:Disabled", wcslen(L"OpenCL Boost:Disabled"));
+			TextOut(hdc, 5, 85, L"OpenCL Speedup:Disabled", wcslen(L"OpenCL Speedup:Disabled"));
 		EndPaint(hwnd, &ps);
-		break;
 	}
-	case WM_CLOSE:
+	case WM_CLOSE:		break;
+
 		DestroyWindow(hwnd);
 		break;
 	case WM_DESTROY:

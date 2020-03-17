@@ -10,9 +10,9 @@ INT WINAPI wWinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPWSTR lpCmdLine
 		return 101;
 	}
 	if (InitializationCuda() != INIT_SUCCESSFULLY)
-		CudaBoostEnabled = false;
+		CudaSpeedupEnabled = false;
 	else
-		CudaBoostEnabled = true;
+		CudaSpeedupEnabled = true;
 	try
 	{
 		ApplicationInstance = hInstance;

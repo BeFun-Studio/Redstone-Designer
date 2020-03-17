@@ -1,0 +1,2 @@
+var showBrowserDoesNotSupportHTML5Warning=true;
+var browserDoesNotSupportHTML5=true;
