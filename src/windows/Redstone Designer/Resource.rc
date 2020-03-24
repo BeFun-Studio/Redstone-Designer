@@ -62,7 +62,7 @@ IDI_REDSTONE_TOOLS      ICON                    "redstone_tools.ico"
 // Menu
 //
 
-IDR_MENU MENU
+IDR_MENU_ENGLISH MENU
 BEGIN
     POPUP "File(&F)"
     BEGIN
@@ -108,12 +108,17 @@ BEGIN
     END
     POPUP "Place(&P)"
     BEGIN
-        MENUITEM "Redstone Components(&R)",     ID_PLACE_REDSTONE
+        POPUP "Redstone Components(&R)"
+        BEGIN
+            MENUITEM "Redstone Block(&B)",          ID_REDSTONECOMPONENTS_REDSTONEBLOCK
+            MENUITEM "Redstone Torch(&T)",          ID_REDSTONECOMPONENTS_REDSTONETORCH
+            MENUITEM "Command Block(&C)",           ID_REDSTONECOMPONENTS_COMMANDBLOCK
+            MENUITEM "Trap Door(&D)",               ID_REDSTONECOMPONENTS_TRAPDOOR
+            MENUITEM "Chest(&Q)",                   ID_REDSTONECOMPONENTS_CHEST
+            MENUITEM "Trap Chest(&W)",              ID_REDSTONECOMPONENTS_TRAPCHEST
+        END
         MENUITEM "Block(&B)",                   ID_PLACE_BLOCK
-    END
-    POPUP "Tools(&T)"
-    BEGIN
-        MENUITEM "Generate a New Connection(&C)...", ID_Menu
+        MENUITEM "Wire(&W)",                    ID_PLACE_WIRE
     END
     POPUP "Help(&H)"
     BEGIN
@@ -122,6 +127,74 @@ BEGIN
         MENUITEM "Settings(&S)...",             ID_HELP_SETTINGS
         MENUITEM SEPARATOR
         MENUITEM "About...(&A)",                ID_HELP_ABOUT
+    END
+END
+
+IDR_MENU_CHINESE_SIMPLIFIED MENU
+BEGIN
+    POPUP "文件(&F)"
+    BEGIN
+        POPUP "新建(Ctrl+&N)"
+        BEGIN
+            MENUITEM "Circuit File(&C)...",         ID_NEW_CIRCUITFILE
+            MENUITEM "Project(&P)...",              ID_NEW_PROJECT
+        END
+        MENUITEM "打开(Ctrl+&O)...",              ID_FILE_OPEN
+        MENUITEM "关闭(Ctrl+&L)",                 ID_FILE_CLOSE
+        MENUITEM "导入(Ctrl+&I)...",              ID_FILE_IMPORT
+        MENUITEM "导出(Ctrl+E)...",               ID_FILE_EXPORT
+        MENUITEM SEPARATOR
+        MENUITEM "保存(Ctrl+&S)",                 ID_FILE_SAVE
+        MENUITEM "另存为(&F)...",                  ID_FILE_SAVEAS
+        MENUITEM "放弃更改(Ctrl+&D)",               ID_FILE_DISCARD
+        MENUITEM "重命名(Ctrl+&R)",                ID_FILE_RENAME
+    END
+    POPUP "编辑(&E)"
+    BEGIN
+        MENUITEM "复制(Ctrl+&C)",                 ID_EDIT_COPY
+        MENUITEM "剪切(Ctrl+&X)",                 ID_EDIT_CUT
+        MENUITEM "粘贴(Ctrl+&V)",                 ID_EDIT_PASTE
+        MENUITEM "撤销(Ctrl+&Z)",                 ID_EDIT_UNDO
+        MENUITEM "重做(Ctrl+&Y)",                 ID_EDIT_REDO
+        MENUITEM "选择(&S)",                      ID_EDIT_SELECT
+        MENUITEM "选择全部(Ctrl+&A)",               ID_EDIT_SELECTALL
+        MENUITEM "取消选择(Ctrl+&U)",               ID_EDIT_UNSELECT
+        MENUITEM "取消选择全部(Ctrl+&O)",             ID_EDIT_UNSELECTALL
+        MENUITEM "移动(&M)",                      ID_EDIT_MOVE
+        MENUITEM "删除(Ctrl+&D)",                 ID_EDIT_DELETE
+        MENUITEM "属性(Ctrl+&P)...",              ID_EDIT_PROPERTIES
+    END
+    POPUP "查看(&V)"
+    BEGIN
+        MENUITEM "移动(Ctrl+&M)",                 ID_VIEW_MOVE
+        MENUITEM "移动到(Ctrl+&T)...",             ID_VIEW_MOVETO
+        POPUP "隐藏(Ctrl+&H)..."
+        BEGIN
+            MENUITEM "方块(&B)",                      ID_HIDE_BLOCKS
+            MENUITEM "器件(&C)",                      ID_HIDE_COMPENTMENTS
+        END
+    END
+    POPUP "放置(&P)"
+    BEGIN
+        POPUP "红石器件(&R)"
+        BEGIN
+            MENUITEM "红石块(&B)",                     ID_REDSTONECOMPONENTS_REDSTONEBLOCK
+            MENUITEM "红石火把(&T)",                    ID_REDSTONECOMPONENTS_REDSTONETORCH
+            MENUITEM "命令方块(&C)",                    ID_REDSTONECOMPONENTS_COMMANDBLOCK
+            MENUITEM "陷阱门(&D)",                     ID_REDSTONECOMPONENTS_TRAPDOOR
+            MENUITEM "箱子(&Q)",                      ID_REDSTONECOMPONENTS_CHEST
+            MENUITEM "陷阱箱(&W)",                     ID_REDSTONECOMPONENTS_TRAPCHEST
+        END
+        MENUITEM "方块(&B)",                      ID_PLACE_BLOCK
+        MENUITEM "导线(&W)",                      ID_PLACE_WIRE
+    END
+    POPUP "帮助(&H)"
+    BEGIN
+        MENUITEM "检查更新(&U)...",                 ID_HELP_CHECKUPDATE
+        MENUITEM "查看帮助文档(&H)...",               ID_HELP_VIEWHELPDOCUMENTS
+        MENUITEM "设置(&S)...",                   ID_HELP_SETTINGS
+        MENUITEM SEPARATOR
+        MENUITEM "关于...(&A)",                   ID_HELP_ABOUT
     END
 END
 
@@ -172,7 +245,193 @@ END
 
 IDC_INDICATOR_LIGHT     CURSOR                  "indicator_light.cur"
 
-IDC_INDICATOR_DARK      CURSOR                  "indicator_dark.cur"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE
+BEGIN
+    IDS_WELCOMETEXT_CHINESE_SIMPLIFIED "欢迎使用Redstone Designer"
+    IDS_WELCOMETEXT_ENGLISH "Welcome to Redstone Designer"
+    IDS_WELCOMETEXT_CHINESE_TRADITIONAL "歡迎使用Redstone Designer"
+    IDS_CONTINUE_AND_CREATE_A_NEW_FILE_BUTTON_TEXT_ENGLISH 
+                            "Create a New File >"
+    IDS_CONTINUE_AND_CREATE_A_NEW_FILE_BUTTON_TEXT_CHINESE_SIMPLIFIED 
+                            "创建新文件 >"
+    IDS_CONTINUE_AND_CREATE_A_NEW_FILE_BUTTON_TEXT_CHINESE_TRADITIONAL 
+                            "創建新檔案 >"
+    IDS_SELECT_A_OPTION_TO_CONTINUE_TEXT_ENGLISH 
+                            "Select a option to continue:"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_SELECT_A_OPTION_TO_CONTINUE_TEXT_CHINESE_SIMPLIFIED "选择一个选项以继续:"
+    IDS_SELECT_A_OPTION_TO_CONTINUE_TEXT_CHINESE_TRADITIONAL "選擇一個選項以繼續:"
+    IDS_CONTINUE_AND_OPEN_EXISTING_FILE_BUTTON_TEXT_ENGLISH 
+                            "Open Existing File >"
+    IDS_CONTINUE_AND_OPEN_EXISTING_FILE_BUTTON_TEXT_CHINESE_SIMPLIFIED 
+                            "打开现有文件 >"
+    IDS_CONTINUE_AND_OPEN_EXISTING_FILE_BUTTON_TEXT_CHINESE_TRADITIONAL 
+                            "打開現有檔案 >"
+    IDS_CONTINUE_WITHOUT_ANY_OPERATION_BUTTON_TEXT_ENGLISH 
+                            "Continue without any operation >"
+    IDS_CONTINUE_WITHOUT_ANY_OPERATION_BUTTON_TEXT_CHINESE_SIMPLIFIED 
+                            "不执行任何操作并继续 >"
+    IDS_CONTINUE_WITHOUT_ANY_OPERATION_BUTTON_TEXT_CHINESE_TRADITIONAL 
+                            "不執行任何操作並繼續>"
+    IDS_DESCRIPTION_BAR_NO_ITEMS_SELECTED_TEXT_ENGLISH "No items selected."
+    IDS_DESCRIPTION_BAR_NO_ITEMS_SELECTED_TEXT_CHINESE_SIMPLIFIED "没有已选择的项目"
+    IDS_DESCRIPTION_BAR_NO_ITEMS_SELECTED_TEXT_CHINESE_TRADITIONAL "沒有已選擇的項目"
+    IDS_DESCRIPTION_BAR_NEW_FILE_TEXT_ENGLISH "Create a new file."
+    IDS_DESCRIPTION_BAR_NEW_FILE_TEXT_CHINESE_SIMPLIFIED "创建一个新文件"
+    IDS_DESCRIPTION_BAR_NEW_FILE_TEXT_CHINESE_TRADITIONAL "創建一個新檔案"
+    IDS_DESCRIPTION_BAR_OPEN_EXISTING_FILE_TEXT_ENGLISH "Open existing file."
+    IDS_DESCRIPTION_BAR_OPEN_EXISTING_FILE_TEXT_CHINESE_SIMPLIFIED "打开已有的文件"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_DESCRIPTION_BAR_OPEN_EXISTING_FILE_TEXT_CHINESE_TRADITIONAL "打開已有的檔案"
+    IDS_OUT_OF_MEMORY_ERROR_TEXT_ENGLISH "Out of memory!"
+    IDS_OUT_OF_MEMORY_ERROR_TEXT_CHINESE_SIMPLIFIED "内存不足！"
+    IDS_OUT_OF_MEMORY_ERROR_TEXT_CHINESE_TRADITIONAL "記憶體空間不足！"
+    IDS_LOGIC_ERROR_TEXT_ENGLISH "A serious logic error has occurred."
+    IDS_LOGIC_ERROR_TEXT_CHINESE_SIMPLIFIED "发生了一个严重的逻辑错误"
+    IDS_LOGIC_ERROR_TEXT_CHINESE_TRADITIONAL "發生了一個嚴重的邏輯錯誤"
+    IDS_CREATE_DIRECT_WRITE_FACTORY_FAILED_TEXT_ENGLISH 
+                            "Create DirectWrite factory object failed!"
+    IDS_CREATE_DIRECT_3D_DEVICE_OBJECT_FAILED_TEXT_ENGLISH 
+                            "Create Direct3D device object failed!"
+    IDS_CREATE_DIRECT_WRITE_FACTORY_FAILED_TEXT_CHINESE_SIMPLIFIED 
+                            "创建DirectWrite工厂对象失败！"
+    IDS_CREATE_DIRECT_WRITE_FACTORY_FAILED_TEXT_CHINESE_TRADITIONAL 
+                            "創建DirectWrite工廠對象失敗！"
+    IDS_CREATE_DIRECT_WRITE_TEXT_FORMAT_FAILED_TEXT_ENGLISH 
+                            "Create DirectWrite text format object failed!"
+    IDS_CREATE_DIRECT_WRITE_TEXT_FORMAT_FAILED_TEXT_CHINESE_SIMPLIFIED 
+                            "创建DirectWrite文本格式对象失败！"
+    IDS_CREATE_DIRECT_WRITE_TEXT_FORMAT_FAILED_TEXT_CHINESE_TRADITIONAL 
+                            "創建DirectWrite文本格式對象失敗！"
+    IDS_CREATE_DIRECT_3D_DEVICE_OBJECT_FAILED_TEXT_CHINESE_SIMPLIFIED 
+                            "创建Direct2D设备对象失败！"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_CREATE_DIRECT_3D_DEVICE_OBJECT_FAILED_TEXT_CHINESE_TRADITIONAL 
+                            "創建Direct2D設備對象失敗！"
+    IDS_CREATE_DIRECT_3D_DEVICE_CONTEXT_OBJECT_FAILED_ENGLISH 
+                            "Create Direct3D device context object failed!"
+    IDS_CREATE_DIRECT_3D_DEVICE_CONTEXT_OBJECT_FAILED_CHINESE_SIMPLIFIED 
+                            "创建Direct2D设备上下文失败！"
+    IDS_CREATE_DIRECT_3D_DEVICE_CONTEXT_OBJECT_FAILED_CHINESE_TRADITIONAL 
+                            "創建Direct2D設備上下文失敗！"
+    IDS_GET_DXGI_ADAPTER_OBJECT_FAILED_ENGLISH 
+                            "Get Direct3D adapter object failed!"
+    IDS_GET_DXGI_ADAPTER_OBJECT_FAILED_CHINESE_SIMPLIFIED "获取Direct3D适配器对象失败！"
+    IDS_GET_DXGI_PARENT_OBJECT_FAILED_ENGLISH "Get DXGI parent object failed!"
+    IDS_GET_DXGI_PARENT_OBJECT_FAILED_CHINESE_SIMPLIFIED "获取DXGI父对象失败！"
+    IDS_GET_DXGI_PARENT_OBJECT_FAILED_CHINESE_TRADITIONAL "獲取DXGI父對象失敗！"
+    IDS_GET_DXGI_ADAPTER_OBJECT_FAILED_CHINESE_TRADITIONAL 
+                            "獲取Direct3D適配器對象失敗！"
+    IDS_CREATE_DIRECT_2D_SWAP_CHAIN_OBJECT_FAILED_ENGLISH 
+                            "Create Direct2D swap chain object failed!"
+    IDS_CREATE_DIRECT_2D_SWAP_CHAIN_OBJECT_FAILED_CHINESE_SIMPLIFIED 
+                            "创建Direct2D交换链对象失败！"
+    IDS_CREATE_DIRECT_2D_SWAP_CHAIN_OBJECT_FAILED_CHINESE_TRADITIONAL 
+                            "創建Direct2D交換鏈對象失敗！"
+    IDS_GET_DIRECT_2D_BUFFER_OBJECT_FAILED_ENGLISH 
+                            "Get Direct2D buffer object failed!"
+    IDS_GET_DIRECT_2D_BUFFER_OBJECT_FAILED_CHINESE_SIMPLIFIED 
+                            "创建Direct2D缓冲区对象失败！"
+    IDS_GET_DIRECT_2D_BUFFER_OBJECT_FAILED_CHINESE_TRADITIONAL 
+                            "創建Direct2D緩衝區對象失敗！"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_CREATE_DIRECT_2D_BITMAP_FROM_DXGI_SURFACE_OBJECT_FAILED_ENGLISH 
+                            "Create Direct2D bitmap object from DXGI surface object failed!"
+    IDS_CREATE_DIRECT_2D_BITMAP_FROM_DXGI_SURFACE_OBJECT_FAILED_CHINESE_SIMPLIFIED 
+                            "从DXGI表面对象创建Direct2D位图对象失败！"
+    IDS_CREATE_DIRECT_2D_BITMAP_FROM_DXGI_SURFACE_OBJECT_FAILED_CHINESE_TRADITIONAL 
+                            "從DXGI表面對象創建Direct2D點陣圖對象失敗！"
+    IDS_CREATE_DIRECT_2D_EFFECT_OBJECT_FAILED_ENGLISH 
+                            "Create Direct2D effect object failed!"
+    IDS_CREATE_DIRECT_2D_EFFECT_OBJECT_FAILED_CHINESE_SIMPLIFIED 
+                            "创建Direct2D效果对象失败！"
+    IDS_CREATE_DIRECT_2D_EFFECT_OBJECT_FAILED_CHINESE_TRADITIONAL 
+                            "創建Direct2D效果對象失敗！"
+    IDS_CREATE_DIRECT_2D_BRUSH_OBJECT_FAILED_ENGLISH 
+                            "Create Direct2D brush failed!"
+    IDS_CREATE_DIRECT_2D_BRUSH_OBJECT_FAILED_CHINESE_SIMPLIFIED 
+                            "创建Direct2D画刷对象失败！"
+    IDS_CREATE_DIRECT_2D_BRUSH_OBJECT_FAILED "創建Direct2D畫刷對象失敗！"
+    IDS_CREATE_DIRECT_2D_GRADIENT_STOP_COLLECTION_FAILED_ENGLISH 
+                            "Create Direct2D gradient stop collection failed!"
+    IDS_CREATE_DIRECT_2D_GRADIENT_STOP_COLLECTION_FAILED_CHINESE_SIMPLIFIED 
+                            "创建Direct2D渐变停止点集失败！"
+    IDS_CREATE_DIRECT_2D_GRADIENT_STOP_COLLECTION_FAILED_CHINESE_TRADITIONAL 
+                            "創建Direct2D漸變停止點集失敗！"
+    IDS_DRAW_WINDOW_CONTENTS_FAILED_ENGLISH "Draw window contents failed!"
+    IDS_DRAW_WINDOW_CONTENTS_FAILED_CHINESE_SIMPLIFIED "绘制窗口内容失败！"
+    IDS_DRAW_WINDOW_CONTENTS_FAILED_CHINESE_TRADITIONAL "繪製視窗內容失敗！"
+    IDS_PRESENT_WINDOW_CONTENTS_FAILED_ENGLISH 
+                            "Present window contents failed!"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_PRESENT_WINDOW_CONTENTS_FAILED_CHINESE_SIMPLIFIED "显示窗口内容失败！"
+    IDS_PRESENT_WINDOW_CONTENTS_FAILED_CHINESE_TRADITIONAL "顯示視窗內容失敗！"
+    IDS_CUDA_SPEEDUP_ENABLED_TEXT_ENGLISH "CUDA Speedup:Enabled"
+    IDS_CUDA_SPEEDUP_ENABLED_TEXT_CHINESE_SIMPLIFIED "CUDA加速:已启用"
+    IDS_CUDA_SPEEDUP_ENABLED_TEXT_CHINESE_TRADITIONAL "CUDA加速:已啟用"
+    IDS_CUDA_SPEEDUP_DISABLED_TEXT_ENGLISH "CUDA Speedup:Disabled"
+    IDS_CUDA_SPEEDUP_DISABLED_TEXT_CHINESE_SIMPLIFIED "CUDA加速:已禁用"
+    IDS_CUDA_SPEEDUP_DISABLED_TEXT_CHINESE_TRADITIONAL "CUDA加速:已禁用"
+    IDS_OPENCL_SPEEDUP_ENABLED_TEXT_ENGLISH "OpenCL Speedup:Enabled"
+    IDS_OPENCL_SPEEDUP_ENABLED_TEXT_CHINESE_SIMPLIFIED "OpenCL加速:已启用"
+    IDS_OPENCL_SPEEDUP_ENABLED_TEXT_CHINESE_TRADITIONAL "OpenCL加速:已啟用"
+    IDS_OPENCL_SPEEDUP_DISABLED_TEXT_ENGLISH "OpenCL Speedup:Enabled"
+    IDS_OPENCL_SPEEDUP_DISABLED_TEXT_CHINESE_SIMPLIFIED "OpenCL加速:已禁用"
+    IDS_OPENCL_SPEEDUP_DISABLED_TEXT_CHINESE_TRADITIONAL "OpenCL加速:已禁用"
+    IDS_INVALID_EVALUATION_COPY_TEXT_ENGLISH "Invalid evaluation copy!"
+    IDS_INVALID_EVALUATION_COPY_TEXT_CHINESE_SIMPLIFIED "无效的评估副本！"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_INVALID_EVALUATION_COPY_TEXT_CHINESE_TRADITIONAL "無效的評估副本！"
+    IDS_COM_ERROR_TEXT_ENGLISH "A serious COM error has occurred."
+    IDS_COM_ERROR_TEXT_CHINESE_SIMPLIFIED "发生了一个严重的COM错误"
+    IDS_COM_ERROR_TEXT_CHINESE_TRADITIONAL "發生了一個嚴重的COM錯誤"
+    IDS_OVERFLOW_ERROR_TEXT_ENGLISH "A variable has overflowed!"
+    IDS_OVERFLOW_ERROR_TEXT_CHINESE_SIMPLIFIED "一个变量导致了上溢错误"
+    IDS_OVERFLOW_ERROR_TEXT_CHINESE_TRADITIONAL "一個變數導致了上溢錯誤"
+    IDS_UNDERFLOW_ERROR_TEXT_ENGLISH "A variable has underflowed!"
+    IDS_UNDERFLOW_ERROR_TEXT_CHINESE_SIMPLIFIED "一个变量导致了下溢错误"
+    IDS_UNDERFLOW_ERROR_TEXT_CHINESE_TRADITIONAL "一個變數導致了下溢錯誤"
+    IDS_FOR_TESTING_PURPOSES_ONLY_TEXT_ENGLISH "For testing purposes only."
+    IDS_FOR_TESTING_PURPOSES_ONLY_TEXT_CHINESE_SIMPLIFIED "仅用于测试,"
+    IDS_FOR_TESTING_PURPOSES_ONLY_TEXT_CHINESE_TRADITIONAL "僅用於測試,"
+    IDS_ERROR_WINDOW_CAPTION_ENGLISH "Error"
+    IDS_ERROR_WINDOW_CAPTION_CHINESE_SIMPLIFIED "错误"
+    IDS_ERROR_WINDOW_CAPTION_CHINESE_TRADITIONAL "錯誤"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_WARNING_WINDOW_CAPTION "Warning"
+    IDS_WARNING_WINDOW_CAPTION_CHINESE_SIMPLIFIED "警告"
+    IDS_WARNING_WINDOW_CAPTION_CHINESE_TRADITIONAL "警告"
+    IDS_INFORMATION_WINDOW_CAPTION_ENGLISH "Information"
+    IDS_INFORMATION_WINDOW_CAPTION_CHINESE_SIMPLIFIED "信息"
+    IDS_INFORMATION_WINDOW_CAPTION_CHINESE_TRADITIONAL "信息"
+END
 
 #endif    // 中文(简体，中国) resources
 /////////////////////////////////////////////////////////////////////////////

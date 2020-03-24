@@ -27,6 +27,7 @@ struct CircuitLayer
 	list<TrapDoor>trap_doors;
 	list<Block>blocks;
 	list<Chest>chests;
+	list<TrapChest>trap_chests;
 };
 struct ImporterGenericSegment
 {

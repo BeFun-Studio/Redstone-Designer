@@ -1,0 +1,18 @@
+Redstone Designer Credits
+==========================
+All-Tasks-In-One & Original Developer
+CodesBuilder
+
+Control Panel
+
+
+Hardware Speedup
+
+User Interface
+
+
+Special Thanks
+
+==========================
+Redstone Designer
+Powered on Direct2D 1.1,Direct3D 11,NVIDIA CUDA and OpenCL.

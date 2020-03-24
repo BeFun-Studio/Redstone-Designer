@@ -5,87 +5,8 @@
 #include <stdarg.h>
 #include <thread>
 
-#define RELEASE_DIRECTX_RESOURCE(PTR) if(PTR){PTR->Release();PTR=NULL;}
-#define LODWORD(l) ((DWORD)(((DWORD_PTR)(l)) & 0xffffffff))
-#define HIDWORD(l) ((DWORD)((((DWORD_PTR)(l)) >> 32) & 0xffffffff))
+#define RELEASE_COM_RESOURCE(PTR) if(PTR){PTR->Release();PTR=NULL;}
 #define CPU_THREAD_COUNT GetCpuThreadCount()
-
-struct BeepCommand
-{
-    bool beep;
-    DWORD frequency;
-    DWORD duration;
-};
-
-class BeepFrequencySequence
-{
-private:
-    std::vector<BeepCommand>beep_commands;
-    size_t current_command_index;
-public:
-    BeepFrequencySequence()
-    {
-        this->current_command_index = 0;
-    }
-    BeepFrequencySequence(size_t argument_count, ...)
-    {
-        va_list args;
-        va_start(args, argument_count);
-        for (int i = 0; i < argument_count; i++)
-            this->beep_commands.push_back(va_arg(args, BeepCommand));
-        va_end(args);
-        this->current_command_index = 0;
-    }
-    bool LoadFromFile(LPCWSTR filename)
-    {
-        FILE* fp = _wfopen(filename, L"r");
-        if (fp == NULL)
-        {
-            fclose(fp);
-            return false;
-        }
-        fseek(fp, 0, SEEK_END);
-        if (ftell(fp) % 9 != 0)
-        {
-            fclose(fp);
-            return false;
-        }
-        bool beep;
-        DWORD frequency;
-        DWORD duration;
-        for (int i = 0; i < ftell(fp) / 5; i++)
-        {
-            fread(&beep, 1, 1, fp);
-            fread(&frequency, sizeof(int), 1, fp);
-            fread(&beep, sizeof(int), 1, fp);
-            BeepCommand push_command = { beep,frequency,duration };
-            this->beep_commands.push_back(push_command);
-        }
-        fclose(fp);
-        return true;
-    }
-    void Load(size_t argument_count, ...)
-    {
-        va_list args;
-        va_start(args, argument_count);
-        for (int i = 0; i < argument_count; i++)
-            this->beep_commands.push_back(va_arg(args, BeepCommand));
-        va_end(args);
-        this->current_command_index = 0;
-    }
-    bool Play()
-    {
-        if (this->current_command_index == this->beep_commands.size() - 1)
-            return false;
-        if (!this->beep_commands[this->current_command_index].beep)
-        {
-            Sleep(this->beep_commands[this->current_command_index].duration);
-            return true;
-        }
-        Beep(this->beep_commands[this->current_command_index].frequency, this->beep_commands[this->current_command_index].duration);
-        return true;
-    }
-};
 
 HFONT _CreateFont(UINT font_size, LPCWSTR font_name, bool italic, bool underline, bool strike_out)
 {
@@ -107,28 +28,25 @@ HFONT _CreateFont(UINT font_size, LPCWSTR font_name, bool italic, bool underline
     font = CreateFontIndirectW(&CurrentFont);
     return font;
 }
+
 unsigned int GetCpuThreadCount()
 {
     return std::thread::hardware_concurrency();
 }
-unsigned int AllocateTasksToCpuCores(unsigned int task_count, ...)
+
+void AllocateTaskToCpuCore(unsigned int cpu_core_id, HANDLE thread_handle)
 {
-    va_list args;
-    va_start(args, task_count);
-    HANDLE current_task_handle;
-    unsigned int allocated_task_count=0;
-    unsigned int current_cpu_id = 1;
-    for (int i = 0; i < task_count; i++)
+    if (cpu_core_id == 0)
     {
-        current_task_handle = va_arg(args, HANDLE);
-        if (current_cpu_id == CPU_THREAD_COUNT)
-            current_cpu_id = 0x00000001;
-        allocated_task_count++;
-        if (SetThreadAffinityMask(current_task_handle, current_cpu_id) == NULL)
-            return allocated_task_count;
+        cpu_core_id = 1;
+        SetThreadAffinityMask(thread_handle, cpu_core_id);
     }
-    va_end(args);
-    return 0;
+    else
+    {
+        for (volatile int i = 0, j = cpu_core_id; i < j; i++)
+            cpu_core_id *= 2;
+        SetThreadAffinityMask(thread_handle, cpu_core_id);
+    }
 }
 
 #endif

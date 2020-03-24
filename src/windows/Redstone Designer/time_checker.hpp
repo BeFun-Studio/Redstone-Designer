@@ -9,7 +9,7 @@
 
 #define EXPIRATION_YEAR 2020
 #define EXPIRATION_MONTH 3
-#define EXPIRATION_DAY 20
+#define EXPIRATION_DAY 30
 
 bool CheckTime()
 {

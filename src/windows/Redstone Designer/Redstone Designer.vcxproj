@@ -48,7 +48,7 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
@@ -83,6 +83,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
+    <CustomBuildAfterTargets />
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -93,7 +94,7 @@
       <BufferSecurityCheck>true</BufferSecurityCheck>
       <CallingConvention>Cdecl</CallingConvention>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <AdditionalIncludeDirectories>..\UI Extension;..\CUDA Extension;$(CUDA_PATH)\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\include;..\UI Extension;..\CUDA Extension;$(CUDA_PATH)\include</AdditionalIncludeDirectories>
       <UseUnicodeForAssemblerListing>true</UseUnicodeForAssemblerListing>
       <PrecompiledHeaderFile />
       <RemoveUnreferencedCodeData>false</RemoveUnreferencedCodeData>
@@ -101,7 +102,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>..\Debug</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\..\lib;..\Debug</AdditionalLibraryDirectories>
       <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;winmm.lib;d2d1.lib;dwrite.lib;d3d11.lib;dxguid.lib;windowscodecs.lib;cuda_extension.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <LargeAddressAware>false</LargeAddressAware>
       <AdditionalOptions>/SAFESEH:NO</AdditionalOptions>
@@ -130,10 +131,11 @@
       <OmitFramePointers>false</OmitFramePointers>
       <CallingConvention>Cdecl</CallingConvention>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <AdditionalIncludeDirectories>..\UI Extension;..\CUDA Extension;$(CUDA_PATH)\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\include;..\UI Extension;..\CUDA Extension;$(CUDA_PATH)\include</AdditionalIncludeDirectories>
       <UseUnicodeForAssemblerListing>true</UseUnicodeForAssemblerListing>
       <PrecompiledHeaderFile />
       <RemoveUnreferencedCodeData>false</RemoveUnreferencedCodeData>
+      <InlineFunctionExpansion>Default</InlineFunctionExpansion>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -155,6 +157,14 @@
       <Outputs>
       </Outputs>
     </CustomBuildStep>
+    <PreLinkEvent>
+      <Command>
+      </Command>
+    </PreLinkEvent>
+    <PostBuildEvent>
+      <Command>
+      </Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -168,7 +178,7 @@
       <Optimization>Disabled</Optimization>
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <CallingConvention>Cdecl</CallingConvention>
-      <AdditionalIncludeDirectories>..\UI Extension;..\CUDA Extension;$(CUDA_PATH)\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\include;..\UI Extension;..\CUDA Extension;$(CUDA_PATH)\include</AdditionalIncludeDirectories>
       <UseUnicodeForAssemblerListing>true</UseUnicodeForAssemblerListing>
       <PrecompiledHeaderFile />
       <RemoveUnreferencedCodeData>false</RemoveUnreferencedCodeData>
@@ -181,7 +191,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>false</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>..\Release</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\..\lib;..\Release</AdditionalLibraryDirectories>
       <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;winmm.lib;d2d1.lib;dwrite.lib;d3d11.lib;dxguid.lib;windowscodecs.lib;cuda_extension.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <LargeAddressAware>false</LargeAddressAware>
       <AdditionalOptions>/SAFESEH:NO</AdditionalOptions>
@@ -204,7 +214,8 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <FunctionLevelLinking>
+      </FunctionLevelLinking>
       <IntrinsicFunctions>false</IntrinsicFunctions>
       <SDLCheck>false</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -214,7 +225,7 @@
       <OmitFramePointers>false</OmitFramePointers>
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <CallingConvention>Cdecl</CallingConvention>
-      <AdditionalIncludeDirectories>..\UI Extension;..\CUDA Extension;$(CUDA_PATH)\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\include;..\UI Extension;..\CUDA Extension;$(CUDA_PATH)\include</AdditionalIncludeDirectories>
       <UseUnicodeForAssemblerListing>true</UseUnicodeForAssemblerListing>
       <PrecompiledHeaderFile />
       <RemoveUnreferencedCodeData>false</RemoveUnreferencedCodeData>
@@ -224,11 +235,13 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>
+      </EnableCOMDATFolding>
+      <OptimizeReferences>
+      </OptimizeReferences>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <AdditionalLibraryDirectories>..\x64\Release</AdditionalLibraryDirectories>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;winmm.lib;d2d1.lib;dwrite.lib;d3d11.lib;dxguid.lib;windowscodecs.lib;cuda_extension.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;winmm.lib;d2d1.lib;dwrite.lib;d3d11.lib;dxguid.lib;windowscodecs.lib;tinyxml.lib;cuda_extension.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <LargeAddressAware>true</LargeAddressAware>
       <IgnoreSpecificDefaultLibraries>
       </IgnoreSpecificDefaultLibraries>
@@ -248,7 +261,13 @@
       </Inputs>
       <Outputs>
       </Outputs>
+      <Command>
+      </Command>
     </CustomBuildStep>
+    <PreLinkEvent>
+      <Command>
+      </Command>
+    </PreLinkEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <MASM Include="asmfuncs_x64.asm">
@@ -267,12 +286,12 @@
     <ClInclude Include="components.hpp" />
     <ClInclude Include="credits.hpp" />
     <ClInclude Include="def.hpp" />
+    <ClInclude Include="lang.hpp" />
     <ClInclude Include="update.hpp" />
     <ClInclude Include="window.hpp" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="texture_loader.hpp" />
     <ClInclude Include="time_checker.hpp" />
-    <ClInclude Include="tools.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />
@@ -300,8 +319,10 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
       </ExcludedFromBuild>
     </None>
-    <None Include="indicator_dark.cur" />
     <None Include="indicator_light.cur" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="CREDITS.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

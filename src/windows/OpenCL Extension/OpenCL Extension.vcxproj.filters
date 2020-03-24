@@ -15,12 +15,12 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ui_extension.h">
+    <ClInclude Include="opencl_extension.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ui_extension.cpp">
+    <ClCompile Include="opencl_extension.c">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

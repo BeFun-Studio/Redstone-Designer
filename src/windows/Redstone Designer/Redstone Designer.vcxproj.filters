@@ -38,9 +38,6 @@
     <ClInclude Include="update.hpp">
       <Filter>源文件</Filter>
     </ClInclude>
-    <ClInclude Include="tools.hpp">
-      <Filter>源文件</Filter>
-    </ClInclude>
     <ClInclude Include="time_checker.hpp">
       <Filter>源文件</Filter>
     </ClInclude>
@@ -63,6 +60,9 @@
       <Filter>源文件</Filter>
     </ClInclude>
     <ClInclude Include="command.hpp">
+      <Filter>源文件</Filter>
+    </ClInclude>
+    <ClInclude Include="lang.hpp">
       <Filter>源文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -100,8 +100,10 @@
     <None Include="indicator_light.cur">
       <Filter>资源文件</Filter>
     </None>
-    <None Include="indicator_dark.cur">
-      <Filter>资源文件</Filter>
-    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="CREDITS.txt">
+      <Filter>杂项</Filter>
+    </Text>
   </ItemGroup>
 </Project>

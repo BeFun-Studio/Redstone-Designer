@@ -1,6 +1,5 @@
 ﻿#pragma once
 #include <Windows.h>
-#include <direct.h>
 #include <d2d1_3.h>
 #include <dxgi1_6.h>
 #include <d3d11.h>
@@ -8,12 +7,12 @@
 #include <vector>
 #include <wincodec.h>
 #include <cuda_extension.cuh>
-#include <ui_extension.h>
 #include <wrl.h>
 #include "api.hpp"
 #include "circuit.hpp"
 #include "time_checker.hpp"
 #include "update.hpp"
+#include "lang.hpp"
 #include "asmfuncs.h"
 #include "resource.h"
 using namespace Microsoft::WRL;
@@ -86,7 +85,6 @@ HANDLE UpdateMainWindowTitleThread;
 HANDLE ShowUpdateAvailableTitleThread;
 HANDLE CheckUpdateAvailableFlagThread;
 HANDLE PlayPleaseWaitAnimationThread;
-HANDLE SwitchCursorThread;
 HANDLE AboutWindowThread;
 
 HANDLE DrawBlocksThread;
@@ -254,29 +252,6 @@ DWORD WINAPI ShowUpdateAvailableTitleThreadProc(LPVOID lpParameter)
 	return 0;
 }
 
-DWORD WINAPI SwitchCursorThreadProc(LPVOID lpParameter)
-{
-	while (true)
-	{
-		if (CurrentMainWindowStatus == INDEX)
-			SetCursor(LoadCursor(ApplicationInstance, (LPCWSTR)IDC_ARROW));
-		else
-		{
-			HDC hdc = GetDC(MainWindowHandle);
-			POINT cursor_point;
-			GetCursorPos(&cursor_point);
-			if (GetRValue(GetPixel(hdc, cursor_point.x, cursor_point.y)) > 127 && GetGValue(GetPixel(hdc, cursor_point.x, cursor_point.y)) > 127 && GetBValue(GetPixel(hdc, cursor_point.x, cursor_point.y)) > 127)
-				SetCursor(LoadCursor(ApplicationInstance, (LPCWSTR)IDC_INDICATOR_DARK));
-			else
-				SetCursor(LoadCursor(ApplicationInstance, (LPCWSTR)IDC_INDICATOR_LIGHT));
-			ReleaseDC(MainWindowHandle, hdc);
-		}
-		if (UserSpecifiedApplicationExit)
-			break;
-	}
-	return 0;
-}
-
 DWORD WINAPI CheckUpdateAvailableFlagThreadProc(LPVOID lpParameter)
 {
 	if (IsUpdateAvailable())
@@ -318,9 +293,9 @@ LRESULT WINAPI AboutWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 		else
 			TextOut(hdc, 5, 85, L"OpenCL Speedup:Disabled", wcslen(L"OpenCL Speedup:Disabled"));
 		EndPaint(hwnd, &ps);
+		break;
 	}
-	case WM_CLOSE:		break;
-
+	case WM_CLOSE:
 		DestroyWindow(hwnd);
 		break;
 	case WM_DESTROY:
@@ -341,13 +316,13 @@ void InitAboutWindow()
 	about_window_class.lpfnWndProc = AboutWindowProc;
 	if (RegisterClass(&about_window_class) == NULL)
 	{
-		MessageBox(MainWindowHandle, L"Register window class failed!\nApplication will be terminated", L"Error", MB_OK | MB_ICONERROR);
+		MessageBox(MainWindowHandle, L"Register window class failed!\nApplication will be terminated", ErrorWindowCaption.c_str(), MB_OK | MB_ICONERROR);
 		PostQuitMessage(0);
 	}
 	about_window_handle = CreateWindowEx(WS_EX_TOOLWINDOW, L"ABOUT_REDSTONE_DESIGNER", L"About Redstone Designer", WS_OVERLAPPEDWINDOW & ~WS_SIZEBOX & ~WS_MAXIMIZEBOX & ~WS_MINIMIZEBOX, CW_USEDEFAULT, CW_USEDEFAULT, 500, 400, MainWindowHandle, NULL, ApplicationInstance, NULL);
 	if (about_window_handle == NULL)
 	{
-		MessageBox(MainWindowHandle, L"Create window failed!\nApplication will be terminated", L"Error", MB_OK | MB_ICONERROR);
+		MessageBox(MainWindowHandle, L"Create window failed!\nApplication will be terminated", ErrorWindowCaption.c_str(), MB_OK | MB_ICONERROR);
 		PostQuitMessage(0);
 	}
 	ShowWindow(about_window_handle, SW_SHOW);
@@ -384,6 +359,7 @@ DWORD WINAPI DrawBlocks(LPVOID lpParameter)
 			}
 		parameters->device_context->FillRectangle(D2D1::RectF(start_draw_position.x - BlockViewSize / 2, start_draw_position.y - BlockViewSize / 2, start_draw_position.x + BlockViewSize / 2, start_draw_position.y + BlockViewSize / 2), parameters->block_border_brush);
 		parameters->device_context->FillRectangle(D2D1::RectF(start_draw_position.x - BlockViewSize / 2 + 2, start_draw_position.y - BlockViewSize / 2 + 2, start_draw_position.x + BlockViewSize / 2 - 2, start_draw_position.y + BlockViewSize / 2 - 2), parameters->block_brush);
+		parameters->block_border_brush->SetOpacity(1);
 		ShowedBlock push_block;
 		push_block.block = &(*itor);
 		push_block.owned_area.left = start_draw_position.x - BlockViewSize / 2;
@@ -502,9 +478,9 @@ LRESULT WINAPI MainWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 		{
 		case INDEX:
 		{
-			buttons.push_back(CreateWindow(L"BUTTON", L"Create a New File >", WS_CHILD | WS_VISIBLE, 10, 80, 360, 50, hwnd, (HMENU)MENU_BUTTON_CREATE_NEW_FILE_INDEX, (HINSTANCE)wParam, NULL));
-			buttons.push_back(CreateWindow(L"BUTTON", L"Open Existing File >", WS_CHILD | WS_VISIBLE, 10, 140, 360, 50, hwnd, (HMENU)MENU_BUTTON_OPEN_EXISTING_FILE_INDEX, (HINSTANCE)wParam, NULL));
-			buttons.push_back(CreateWindow(L"BUTTON", L"Continue Without Any Operation >", WS_CHILD | WS_VISIBLE, 10, 200, 360, 50, hwnd, (HMENU)MENU_BUTTON_CONTINUE_WITHOUT_ANY_OPERATION_INDEX, (HINSTANCE)wParam, NULL));
+			buttons.push_back(CreateWindow(L"BUTTON", ContinueAndCreateANewFileButtonText.c_str(), WS_CHILD | WS_VISIBLE, 10, 80, 360, 50, hwnd, (HMENU)MENU_BUTTON_CREATE_NEW_FILE_INDEX, (HINSTANCE)wParam, NULL));
+			buttons.push_back(CreateWindow(L"BUTTON", ContinueAndOpenExistingFileButtonText.c_str(), WS_CHILD | WS_VISIBLE, 10, 140, 360, 50, hwnd, (HMENU)MENU_BUTTON_OPEN_EXISTING_FILE_INDEX, (HINSTANCE)wParam, NULL));
+			buttons.push_back(CreateWindow(L"BUTTON", ContinueWithoutAnyOperationButtonText.c_str(), WS_CHILD | WS_VISIBLE, 10, 200, 360, 50, hwnd, (HMENU)MENU_BUTTON_CONTINUE_WITHOUT_ANY_OPERATION_INDEX, (HINSTANCE)wParam, NULL));
 			for (int i = 0; i < buttons.size(); i++)
 			{
 				ShowWindow(buttons[i], SW_SHOW);
@@ -519,6 +495,7 @@ LRESULT WINAPI MainWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 			GetClientRect(hwnd, &client_rect);
 			InvalidateRect(hwnd, &client_rect, false);
 			CurrentMainWindowStatus = FILE_EDITOR;
+			SendMessage(hwnd, WM_SET_DESCRIPTION_BAR, (WPARAM)DescriptionBarNoItemsSelectedText.c_str(), NULL);
 			break;
 		}
 		}
@@ -538,13 +515,11 @@ LRESULT WINAPI MainWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 		int mouse_x = LOWORD(lParam);
 		int mouse_y = HIWORD(lParam);
 		for (int i = 0; i < ShowedBlocks.size(); i++)
-		{
-			if (mouse_x > ShowedBlocks[i].owned_area.left&& mouse_y > ShowedBlocks[i].owned_area.top&& mouse_x < ShowedBlocks[i].owned_area.right && mouse_y < ShowedBlocks[i].owned_area.bottom)
+			if (mouse_x >= ShowedBlocks[i].owned_area.left && mouse_y >= ShowedBlocks[i].owned_area.top && mouse_x <= ShowedBlocks[i].owned_area.right && mouse_y <= ShowedBlocks[i].owned_area.bottom)
 			{
 				SelectedBlocks.push_back(ShowedBlocks[i].block);
 				break;
 			}
-		}
 		RECT client_rect;
 		GetClientRect(hwnd, &client_rect);
 		InvalidateRect(hwnd, &client_rect, false);
@@ -591,52 +566,52 @@ LRESULT WINAPI MainWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 		D2D1_GRADIENT_STOP filename_box_stops[3];
 		if (FAILED(DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(write_factory), (IUnknown**)&write_factory)))
 		{
-			MessageBox(hwnd, L"Create DirectX write factory failed!\n\nApplication will be terminated.", L"Error", MB_OK | MB_ICONERROR);
+			MessageBox(hwnd, CreateDirectWriteFactoryFailedText.c_str(), ErrorWindowCaption.c_str(), MB_OK | MB_ICONERROR);
 			PostQuitMessage(1);
 		}
 		if (FAILED(write_factory->CreateTextFormat(L"Unifont", NULL, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 30, L"", &title_text_format)))
 		{
-			MessageBox(hwnd, L"Create DirectX text format failed!\n\nApplication will be terminated.", L"Error", MB_OK | MB_ICONERROR);
+			MessageBox(hwnd, CreateDirectWriteTextFormatFailedText.c_str(), ErrorWindowCaption.c_str(), MB_OK | MB_ICONERROR);
 			PostQuitMessage(1);
 		}
-		if (FAILED(write_factory->CreateTextFormat(L"Unifont", NULL, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 20, L"", &normal_text_format)))
+		if (FAILED(write_factory->CreateTextFormat(L"Unifont", NULL, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 18, L"", &normal_text_format)))
 		{
-			MessageBox(hwnd, L"Create DirectX text format failed!\n\nApplication will be terminated.", L"Error", MB_OK | MB_ICONERROR);
+			MessageBox(hwnd, CreateDirectWriteTextFormatFailedText.c_str(), ErrorWindowCaption.c_str(), MB_OK | MB_ICONERROR);
 			PostQuitMessage(1);
 		}
 		if (FAILED(D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, D3D11_CREATE_DEVICE_BGRA_SUPPORT, &feature_level, 1, D3D11_SDK_VERSION, &device, NULL, &device_context)))
 		{
-			MessageBox(hwnd, L"Create DirectX device failed!\n\nApplication will be terminated.", L"Error", MB_OK | MB_ICONERROR);
+			MessageBox(hwnd, CreateDirect3DDeviceObjectFailed.c_str(), ErrorWindowCaption.c_str(), MB_OK | MB_ICONERROR);
 			PostQuitMessage(1);
 		}
 		if (FAILED(device->QueryInterface(__uuidof(IDXGIDevice1), (void**)&dxgi_device)))
 		{
-			MessageBox(hwnd, L"Query DirectX interface failed!\n\nApplication will be terminated.", L"Error", MB_OK | MB_ICONERROR);
+			MessageBox(hwnd, L"Query DirectX interface failed!\n\nApplication will be terminated.", ErrorWindowCaption.c_str(), MB_OK | MB_ICONERROR);
 			PostQuitMessage(1);
 		}
 		if (FAILED(D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, __uuidof(ID2D1Factory1), (void**)&factory)))
 		{
-			MessageBox(hwnd, L"Create DirectX device failed!\n\nApplication will be terminated.", L"Error", MB_OK | MB_ICONERROR);
+			MessageBox(hwnd, L"Create DirectX device failed!\n\nApplication will be terminated.", ErrorWindowCaption.c_str(), MB_OK | MB_ICONERROR);
 			PostQuitMessage(1);
 		}
 		if (FAILED(factory->CreateDevice(dxgi_device.Get(), &device_2d)))
 		{
-			MessageBox(hwnd, L"Create DirectX device failed!\n\nApplication will be terminated.", L"Error", MB_OK | MB_ICONERROR);
+			MessageBox(hwnd, L"Create DirectX device failed!\n\nApplication will be terminated.", ErrorWindowCaption.c_str(), MB_OK | MB_ICONERROR);
 			PostQuitMessage(1);
 		}
 		if (FAILED(device_2d->CreateDeviceContext(D2D1_DEVICE_CONTEXT_OPTIONS_NONE, &device_context_2d)))
 		{
-			MessageBox(hwnd, L"Create DirectX device context failed!\n\nApplication will be terminated.", L"Error", MB_OK | MB_ICONERROR);
+			MessageBox(hwnd, L"Create DirectX device context failed!\n\nApplication will be terminated.", ErrorWindowCaption.c_str(), MB_OK | MB_ICONERROR);
 			PostQuitMessage(1);
 		}
 		if (FAILED(dxgi_device->GetAdapter(&dxgi_adapter)))
 		{
-			MessageBox(hwnd, L"Get DirectX adapter failed!\n\nApplication will be terminated.", L"Error", MB_OK | MB_ICONERROR);
+			MessageBox(hwnd, GetDXGIAdapterObjectFailed.c_str() , ErrorWindowCaption.c_str(), MB_OK | MB_ICONERROR);
 			PostQuitMessage(1);
 		}
 		if (FAILED(dxgi_adapter->GetParent(IID_PPV_ARGS(&dxgi_factory))))
 		{
-			MessageBox(hwnd, L"Get DirectX parent object failed!\n\nApplication will be terminated.", L"Error", MB_OK | MB_ICONERROR);
+			MessageBox(hwnd,GetDXGIParentObjectFailed.c_str(), ErrorWindowCaption.c_str(), MB_OK | MB_ICONERROR);
 			PostQuitMessage(1);
 		}
 		fullscreen_desc.RefreshRate.Numerator = 1;
@@ -658,46 +633,41 @@ LRESULT WINAPI MainWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 		swap_chain_desc.Flags = NULL;
 		if (FAILED(dxgi_factory->CreateSwapChainForHwnd(device.Get(), hwnd, &swap_chain_desc, &fullscreen_desc, NULL, &swap_chain)))
 		{
-			MessageBox(hwnd, L"Create DirectX swap chain failed!\n\nApplication will be terminated.", L"Error", MB_OK | MB_ICONERROR);
-			PostQuitMessage(1);
-		}
-		if (FAILED(dxgi_device->SetMaximumFrameLatency(1)))
-		{
-			MessageBox(hwnd, L"Set maximum frame latency failed!\n\nApplication will be terminated.", L"Error", MB_OK | MB_ICONERROR);
+			MessageBox(hwnd, CreateDirect2DSwapChainObjectFailed.c_str(), ErrorWindowCaption.c_str(), MB_OK | MB_ICONERROR);
 			PostQuitMessage(1);
 		}
 		if (FAILED(swap_chain->GetBuffer(0, IID_PPV_ARGS(&back_buffer))))
 		{
-			MessageBox(hwnd, L"Get DirectX buffer failed!\n\nApplication will be terminated.", L"Error", MB_OK | MB_ICONERROR);
+			MessageBox(hwnd, GetDirect2DBufferObjectFailed.c_str(), ErrorWindowCaption.c_str(), MB_OK | MB_ICONERROR);
 			PostQuitMessage(1);
 		}
 		bitmap_properties = D2D1::BitmapProperties1(D2D1_BITMAP_OPTIONS_TARGET | D2D1_BITMAP_OPTIONS_CANNOT_DRAW, D2D1::PixelFormat(DXGI_FORMAT_B8G8R8A8_UNORM, D2D1_ALPHA_MODE_PREMULTIPLIED), GetDpiForWindow(hwnd), GetDpiForWindow(hwnd));
 		if (FAILED(device_context_2d->CreateBitmapFromDxgiSurface(back_buffer.Get(), &bitmap_properties, &target_bitmap)))
 		{
-			MessageBox(hwnd, L"Create bitmap from DXGI surface failed!\n\nApplication will be terminated.", L"Error", MB_OK | MB_ICONERROR);
+			MessageBox(hwnd, CreateDirect2DBitmapFromDXGISurfaceObjectFailed.c_str(), ErrorWindowCaption.c_str(), MB_OK | MB_ICONERROR);
 			PostQuitMessage(1);
 		}
 		device_context_2d->SetTarget(target_bitmap.Get());
 		device_context_2d->SetUnitMode(D2D1_UNIT_MODE_PIXELS);
 		if (FAILED(device_context_2d->CreateEffect(CLSID_D2D1GaussianBlur, &blur_effect)))
 		{
-			MessageBox(hwnd, L"Create DirectX effect failed!\n\nApplication will be terminated.", L"Error", MB_OK | MB_ICONERROR);
+			MessageBox(hwnd, CreateDirect2DEffectObjectFailed.c_str(), ErrorWindowCaption.c_str(), MB_OK | MB_ICONERROR);
 			PostQuitMessage(1);
 		}
 		if (CurrentMainWindowStatus == INDEX)
 		{
-			index_stops[0].color = D2D1::ColorF(D2D1::ColorF::Orange);
+			index_stops[0].color = D2D1::ColorF(RGB(100, 100, 255));
 			index_stops[0].position = 0;
 			index_stops[1].color = D2D1::ColorF(D2D1::ColorF::Firebrick);
 			index_stops[1].position = 1;
 			if (FAILED(device_context_2d->CreateGradientStopCollection(index_stops, 2, &index_background_collection)))
 			{
-				MessageBox(hwnd, L"Create DirectX gradient stop collection failed!\n\nApplication will be terminated.", L"Error", MB_OK | MB_ICONERROR);
+				MessageBox(hwnd, CreateDirect2DGradientStopCollectionFailedText.c_str(), ErrorWindowCaption.c_str(), MB_OK | MB_ICONERROR);
 				PostQuitMessage(1);
 			}
 			if (FAILED(device_context_2d->CreateLinearGradientBrush(D2D1::LinearGradientBrushProperties(D2D1::Point2F(client_rect.left, client_rect.top), D2D1::Point2F(client_rect.right, client_rect.bottom)), index_background_collection.Get(), &index_background_brush)))
 			{
-				MessageBox(hwnd, L"Create DirectX linear gradient brush failed!\n\nApplication will be terminated.", L"Error", MB_OK | MB_ICONERROR);
+				MessageBox(hwnd, CreateDirect2DBrushFailed.c_str(), ErrorWindowCaption.c_str(), MB_OK | MB_ICONERROR);
 				PostQuitMessage(1);
 			}
 		}
@@ -711,12 +681,12 @@ LRESULT WINAPI MainWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 			file_editor_background_stops[2].position = 1;
 			if (FAILED(device_context_2d->CreateGradientStopCollection(file_editor_background_stops, 3, &file_editor_background_collection)))
 			{
-				MessageBox(hwnd, L"Create DirectX gradient stop collection failed!\n\nApplication will be terminated.", L"Error", MB_OK | MB_ICONERROR);
+				MessageBox(hwnd, CreateDirect2DGradientStopCollectionFailedText.c_str(), ErrorWindowCaption.c_str(), MB_OK | MB_ICONERROR);
 				PostQuitMessage(1);
 			}
 			if (FAILED(device_context_2d->CreateLinearGradientBrush(D2D1::LinearGradientBrushProperties(D2D1::Point2F(client_rect.left, client_rect.top), D2D1::Point2F(client_rect.left, client_rect.bottom)), file_editor_background_collection.Get(), &file_editor_background_brush)))
 			{
-				MessageBox(hwnd, L"Create DirectX linear gradient brush failed!\n\nApplication will be terminated.", L"Error", MB_OK | MB_ICONERROR);
+				MessageBox(hwnd, CreateDirect2DBrushFailed.c_str(), ErrorWindowCaption.c_str(), MB_OK | MB_ICONERROR);
 				PostQuitMessage(1);
 			}
 			description_bar_stops[0].color = D2D1::ColorF(D2D1::ColorF::Crimson);
@@ -727,12 +697,12 @@ LRESULT WINAPI MainWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 			description_bar_stops[2].position = 1;
 			if (FAILED(device_context_2d->CreateGradientStopCollection(description_bar_stops, 3, &description_bar_collection)))
 			{
-				MessageBox(hwnd, L"Create DirectX gradient stop collection failed!\n\nApplication will be terminated.", L"Error", MB_OK | MB_ICONERROR);
+				MessageBox(hwnd, CreateDirect2DGradientStopCollectionFailedText.c_str(), ErrorWindowCaption.c_str(), MB_OK | MB_ICONERROR);
 				PostQuitMessage(1);
 			}
 			if (FAILED(device_context_2d->CreateLinearGradientBrush(D2D1::LinearGradientBrushProperties(D2D1::Point2F(client_rect.left, client_rect.bottom-20), D2D1::Point2F(client_rect.right, client_rect.bottom)), description_bar_collection.Get(), &description_bar_brush)))
 			{
-				MessageBox(hwnd, L"Create DirectX linear gradient brush failed!\n\nApplication will be terminated.", L"Error", MB_OK | MB_ICONERROR);
+				MessageBox(hwnd, CreateDirect2DBrushFailed.c_str(), ErrorWindowCaption.c_str(), MB_OK | MB_ICONERROR);
 				PostQuitMessage(1);
 			}
 			filename_box_stops[0].color = D2D1::ColorF(D2D1::ColorF::Purple);
@@ -743,23 +713,23 @@ LRESULT WINAPI MainWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 			filename_box_stops[2].position = 1;
 			if (FAILED(device_context_2d->CreateGradientStopCollection(filename_box_stops, 3, &filename_box_collection)))
 			{
-				MessageBox(hwnd, L"Create DirectX gradient stop collection failed!\n\nApplication will be terminated.", L"Error", MB_OK | MB_ICONERROR);
+				MessageBox(hwnd, CreateDirect2DGradientStopCollectionFailedText.c_str(), ErrorWindowCaption.c_str(), MB_OK | MB_ICONERROR);
 				PostQuitMessage(1);
 			}
 			if (FAILED(device_context_2d->CreateLinearGradientBrush(D2D1::LinearGradientBrushProperties(D2D1::Point2F(client_rect.left, client_rect.bottom - 20), D2D1::Point2F(client_rect.right, client_rect.bottom)), filename_box_collection.Get(), &filename_box_brush)))
 			{
-				MessageBox(hwnd, L"Create DirectX linear gradient brush failed!\n\nApplication will be terminated.", L"Error", MB_OK | MB_ICONERROR);
+				MessageBox(hwnd, CreateDirect2DBrushFailed.c_str(), ErrorWindowCaption.c_str(), MB_OK | MB_ICONERROR);
 				PostQuitMessage(1);
 			}
 			if (FAILED(device_context_2d->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Silver), &border_brush)))
 			{
-				MessageBox(hwnd, L"Create DirectX solid color brush failed!\n\nApplication will be terminated.", L"Error", MB_OK | MB_ICONERROR);
+				MessageBox(hwnd, CreateDirect2DBrushFailed.c_str(), ErrorWindowCaption.c_str(), MB_OK | MB_ICONERROR);
 				PostQuitMessage(1);
 			}
 		}
 		if (FAILED(device_context_2d->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::White), &text_brush)))
 		{
-			MessageBox(hwnd, L"Create DirectX solid color brush failed!\n\nApplication will be terminated.", L"Error", MB_OK | MB_ICONERROR);
+			MessageBox(hwnd, CreateDirect2DBrushFailed.c_str(), ErrorWindowCaption.c_str(), MB_OK | MB_ICONERROR);
 			PostQuitMessage(1);
 		}
 		device_context_2d->BeginDraw();
@@ -768,8 +738,8 @@ LRESULT WINAPI MainWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 		{
 		case INDEX:
 			device_context_2d->FillRectangle(D2D1::RectF(client_rect.left, client_rect.top, client_rect.right, client_rect.bottom), index_background_brush.Get());
-			device_context_2d->DrawText(L"Welcome to Redstone Designer", wcslen(L"Welcome to Redstone Designer"), title_text_format.Get(), D2D1::RectF(client_rect.left, client_rect.top, client_rect.right, client_rect.bottom), text_brush.Get());
-			device_context_2d->DrawText(L"\n\nChoose a option to continue", wcslen(L"\n\nChoose a option to continue"), normal_text_format.Get(), D2D1::RectF(client_rect.left, client_rect.top, client_rect.right, client_rect.bottom), text_brush.Get());
+			device_context_2d->DrawText(WelcomeText.c_str(), wcslen(WelcomeText.c_str()), title_text_format.Get(), D2D1::RectF(client_rect.left, client_rect.top, client_rect.right, client_rect.bottom), text_brush.Get());
+			device_context_2d->DrawText((L"\n\n"+SelectAOptionToContinueText).c_str(), wcslen((L"\n\n" + SelectAOptionToContinueText).c_str()), normal_text_format.Get(), D2D1::RectF(client_rect.left, client_rect.top, client_rect.right, client_rect.bottom), text_brush.Get());
 			break;
 		case FILE_EDITOR:
 		{
@@ -780,8 +750,9 @@ LRESULT WINAPI MainWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 			draw_block_param.device_context = device_context_2d.Get();
 			if (CurrentEditingFileName.length() != 0)
 			{
-				DrawBlocksThread = CreateThread(NULL, 0, DrawBlocks, &draw_block_param, NULL, NULL);
+				DrawBlocksThread = CreateThread(NULL, 1, DrawBlocks, &draw_block_param, NULL, NULL);
 			}
+			AllocateTaskToCpuCore(0, DrawBlocksThread);
 			WaitForSingleObject(DrawBlocksThread, INFINITE);
 			device_context_2d->FillRectangle(D2D1::RectF(client_rect.left + 4, client_rect.top + 4, client_rect.right - 4, client_rect.top + 26), border_brush.Get());
 			device_context_2d->FillRectangle(D2D1::RectF(client_rect.left + 5, client_rect.top + 5, client_rect.right - 5, client_rect.top + 25), filename_box_brush.Get());
@@ -793,15 +764,16 @@ LRESULT WINAPI MainWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 		{
 			device_context_2d->FillRectangle(D2D1::RectF(client_rect.left, client_rect.bottom - 20, client_rect.right, client_rect.bottom), description_bar_brush.Get());
 			device_context_2d->FillRectangle(D2D1::RectF(client_rect.left, client_rect.bottom - 21, client_rect.right, client_rect.bottom - 20), border_brush.Get());
+			device_context_2d->DrawText(MainWindowDescriptionBarText.c_str(), MainWindowDescriptionBarText.length(), normal_text_format.Get(), D2D1::RectF(client_rect.left, client_rect.bottom - 20, client_rect.right, client_rect.bottom), text_brush.Get());
 		}
 		if (FAILED(device_context_2d->EndDraw()))
 		{
-			MessageBox(hwnd, L"Drawing failed!\n\nApplication will be terminated.", L"Error", MB_OK | MB_ICONERROR);
+			MessageBox(hwnd, DrawWindowContentsFailedText.c_str(), ErrorWindowCaption.c_str(), MB_OK | MB_ICONERROR);
 			PostQuitMessage(1);
 		}
 		if (FAILED(swap_chain->Present(true,false)))
 		{
-			MessageBox(hwnd, L"Present window failed!\n\nApplication will be terminated.", L"Error", MB_OK | MB_ICONERROR);
+			MessageBox(hwnd, PresentWindowContentsFailedText.c_str(), ErrorWindowCaption.c_str(), MB_OK | MB_ICONERROR);
 			PostQuitMessage(1);
 		}
 		break;
@@ -821,21 +793,22 @@ LRESULT WINAPI MainWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 		HDC hdc = GetDC(hwnd);
 		SetBkMode(hdc, TRANSPARENT);
 		SetTextColor(hdc, RGB(0, 0, 0));
+		SelectObject(hdc, ControlFont);
 		if (CurrentMainWindowStatus == INDEX)
 		{
-			TextOut(hdc, 0, client_rect.bottom - 31, L"Redstone Designer Codename 'Emerald'", wcslen(L"Redstone Designer Codename 'Emerald'"));
-			TextOut(hdc, 0, client_rect.bottom - 16, L"For testing purposes only. Insider Test 0", wcslen(L"For testing purposes only. Insider Test 0"));
+			TextOut(hdc, 0, client_rect.bottom - 32, L"Redstone Designer Codename 'Emerald'", wcslen(L"Redstone Designer Codename 'Emerald'"));
+			TextOut(hdc, 0, client_rect.bottom - 16, ((wstring)ForTestingPurposesOnlyText + L" Insider Test 0").c_str(), wcslen(((wstring)ForTestingPurposesOnlyText + L" Insider Test 0").c_str()));
 			SetTextColor(hdc, RGB(255, 255, 255));
-			TextOut(hdc, 0, client_rect.bottom - 33, L"Redstone Designer Codename 'Emerald'", wcslen(L"Redstone Designer Codename 'Emerald'"));
-			TextOut(hdc, 0, client_rect.bottom - 18, L"For testing purposes only. Insider Test 0", wcslen(L"For testing purposes only. Insider Test 0"));
+			TextOut(hdc, 0, client_rect.bottom - 34, L"Redstone Designer Codename 'Emerald'", wcslen(L"Redstone Designer Codename 'Emerald'"));
+			TextOut(hdc, 0, client_rect.bottom - 18, ((wstring)ForTestingPurposesOnlyText + L" Insider Test 0").c_str(), wcslen(((wstring)ForTestingPurposesOnlyText + L" Insider Test 0").c_str()));
 		}
 		else
 		{
-			TextOut(hdc, 0, client_rect.bottom - 55, L"Redstone Designer Codename 'Emerald'", wcslen(L"Redstone Designer Codename 'Emerald'"));
-			TextOut(hdc, 0, client_rect.bottom - 40, L"For testing purposes only. Insider Test 0", wcslen(L"For testing purposes only. Insider Test 0"));
-			SetTextColor(hdc, RGB(255, 255, 255));
 			TextOut(hdc, 0, client_rect.bottom - 57, L"Redstone Designer Codename 'Emerald'", wcslen(L"Redstone Designer Codename 'Emerald'"));
-			TextOut(hdc, 0, client_rect.bottom - 42, L"For testing purposes only. Insider Test 0", wcslen(L"For testing purposes only. Insider Test 0"));
+			TextOut(hdc, 0, client_rect.bottom - 40, ((wstring)ForTestingPurposesOnlyText + L" Insider Test 0").c_str(), wcslen(((wstring)ForTestingPurposesOnlyText + L" Insider Test 0").c_str()));
+			SetTextColor(hdc, RGB(255, 255, 255));
+			TextOut(hdc, 0, client_rect.bottom - 59, L"Redstone Designer Codename 'Emerald'", wcslen(L"Redstone Designer Codename 'Emerald'"));
+			TextOut(hdc, 0, client_rect.bottom - 42, ((wstring)ForTestingPurposesOnlyText + L" Insider Test 0").c_str(), wcslen(((wstring)ForTestingPurposesOnlyText + L" Insider Test 0").c_str()));
 		}
 		ReleaseDC(hwnd, hdc);
 	}
@@ -850,25 +823,41 @@ void InitMainWindow(HINSTANCE hInstance)
 	MainWindowClass.lpszClassName = L"REDSTONE_DESIGNER";
 	MainWindowClass.lpfnWndProc = MainWindowProc;
 	MainWindowClass.hInstance = hInstance;
+	MainWindowClass.hCursor = LoadCursor(ApplicationInstance, (LPCWSTR)IDC_ARROW);
 	MainWindowClass.hIcon = LoadIcon(hInstance, (LPCWSTR)IDI_LOGO);
 	MainWindowClass.style = CS_HREDRAW | CS_VREDRAW;
-	MainWindowClass.lpszMenuName = (LPCWSTR)IDR_MENU;
+	
 	MainWindowClass.hbrBackground = (HBRUSH)GetStockObject(NULL_BRUSH);
 	if (RegisterClass(&MainWindowClass) == NULL)
 	{
-		MessageBox(NULL, L"Register Window Class Failed!", L"Error", MB_OK | MB_ICONERROR);
+		MessageBox(NULL, L"Register Window Class Failed!", ErrorWindowCaption.c_str(), MB_OK | MB_ICONERROR);
 		exit(1);
 	}
-	MainWindowHandle = CreateWindow(L"REDSTONE_DESIGNER", L"Minecraft Redstone Designer", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 1024, 768, NULL, NULL, hInstance, NULL);
+	switch (GlobalLanguage)
+	{
+	case ENGLISH:
+		MainWindowHandle = CreateWindow(L"REDSTONE_DESIGNER", L"Minecraft Redstone Designer", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 1024, 768, NULL, LoadMenuW(ApplicationInstance, (LPCWSTR)IDR_MENU_ENGLISH), hInstance, NULL);
+		break;
+	case CHINESE_SIMPLIFIED:
+		MainWindowHandle = CreateWindow(L"REDSTONE_DESIGNER", L"Minecraft Redstone Designer", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 1024, 768, NULL, LoadMenuW(ApplicationInstance, (LPCWSTR)IDR_MENU_CHINESE_SIMPLIFIED), hInstance, NULL);
+		break;
+	default:
+		throw InvalidLanguage();
+	}
+	if (MainWindowHandle == NULL)
+	{
+		MessageBox(NULL, L"Create window failed!", ErrorWindowCaption.c_str(), MB_OK | MB_ICONERROR);
+		exit(1);
+	}
 	ShowWindow(MainWindowHandle, SW_SHOW);
 	SendMessage(MainWindowHandle, WM_SWITCH_STATUS, (WPARAM)hInstance, NULL);
 	UpdateMainWindowTitleThread = CreateThread(NULL, 0, UpdateMainWindowTitleThreadProc, NULL, NULL, NULL);
 	CheckUpdateAvailableFlagThread = CreateThread(NULL, 0, CheckUpdateAvailableFlagThreadProc, NULL, NULL, NULL);
-	SwitchCursorThread = CreateThread(NULL, 0, SwitchCursorThreadProc, NULL, NULL, NULL);
 }
 
 void ApplicationDestructor(HINSTANCE hInstance)
 {
+	UnregisterClass(L"ABOUT_REDSTONE_DESIGNER", hInstance);
 	UnregisterClass(L"REDSTONE_DESIGNER", hInstance);
 }
 
@@ -884,32 +873,32 @@ void LoadTextures()
 	ComPtr<IWICImagingFactory> imaging_factory;
 	if (FAILED(D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, __uuidof(ID2D1Factory1), (void**)&factory)))
 	{
-		MessageBox(NULL, L"Create DirectX device failed!\n\nApplication will be terminated.", L"Error", MB_OK | MB_ICONERROR);
+		MessageBox(NULL, L"Create DirectX device failed!\n\nApplication will be terminated.", ErrorWindowCaption.c_str(), MB_OK | MB_ICONERROR);
 		PostQuitMessage(1);
 	}
 	if (FAILED(CoCreateInstance(CLSID_WICImagingFactory1, NULL, CLSCTX_INPROC_SERVER, IID_IWICImagingFactory, (LPVOID*)&imaging_factory)))
 	{
-		MessageBox(NULL, L"Create imaging factory failed!\n\nApplication will be terminated.", L"Error", MB_OK | MB_ICONERROR);
+		MessageBox(NULL, L"Create imaging factory failed!\n\nApplication will be terminated.", ErrorWindowCaption.c_str(), MB_OK | MB_ICONERROR);
 		PostQuitMessage(1);
 	}
 	if (FAILED(imaging_factory->CreateDecoderFromFilename(L"resources/normal_block.bmp", NULL, GENERIC_READ, WICDecodeMetadataCacheOnLoad, &decoder)))
 	{
-		MessageBox(NULL, L"Create image decoder failed!\n\nApplication will be terminated.", L"Error", MB_OK | MB_ICONERROR);
+		MessageBox(NULL, L"Create image decoder failed!\n\nApplication will be terminated.", ErrorWindowCaption.c_str(), MB_OK | MB_ICONERROR);
 		PostQuitMessage(1);
 	}
 	if (FAILED(decoder->GetFrame(0, &frame_decode)))
 	{
-		MessageBox(NULL, L"Get image frame failed!\n\nApplication will be terminated.", L"Error", MB_OK | MB_ICONERROR);
+		MessageBox(NULL, L"Get image frame failed!\n\nApplication will be terminated.", ErrorWindowCaption.c_str(), MB_OK | MB_ICONERROR);
 		PostQuitMessage(1);
 	}
 	if (FAILED(imaging_factory->CreateFormatConverter(&converter)))
 	{
-		MessageBox(NULL, L"Create image converter failed!\n\nApplication will be terminated.", L"Error", MB_OK | MB_ICONERROR);
+		MessageBox(NULL, L"Create image converter failed!\n\nApplication will be terminated.", ErrorWindowCaption.c_str(), MB_OK | MB_ICONERROR);
 		PostQuitMessage(1);
 	}
 	if(FAILED(converter->Initialize(frame_decode.Get(),GUID_WICPixelFormat32bppPBGRA,WICBitmapDitherTypeNone,NULL,0,WICBitmapPaletteTypeMedianCut)))
 	{
-		MessageBox(NULL, L"Initialize image converter failed!\n\nApplication will be terminated.", L"Error", MB_OK | MB_ICONERROR);
+		MessageBox(NULL, L"Initialize image converter failed!\n\nApplication will be terminated.", ErrorWindowCaption.c_str(), MB_OK | MB_ICONERROR);
 		PostQuitMessage(1);
 	}
 }
