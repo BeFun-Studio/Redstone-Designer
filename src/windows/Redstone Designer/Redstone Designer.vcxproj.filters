@@ -65,6 +65,12 @@
     <ClInclude Include="lang.hpp">
       <Filter>源文件</Filter>
     </ClInclude>
+    <ClInclude Include="control.hpp">
+      <Filter>源文件</Filter>
+    </ClInclude>
+    <ClInclude Include="debug.hpp">
+      <Filter>源文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc">

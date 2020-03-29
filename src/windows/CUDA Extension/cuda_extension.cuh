@@ -26,7 +26,6 @@ typedef enum
 extern "C" {
 #endif
 
-DLLAPI __global__ bool SetCudaDevice(int device_id);
 DLLAPI __global__ INIT_CUDA_RETURN_VALUES InitializationCuda();
 DLLAPI __device__ void CudaAddByte(__global__ char* dest, unsigned short count, ...);
 DLLAPI __device__ void CudaAddWord(__global__ short* dest, unsigned short count, ...);

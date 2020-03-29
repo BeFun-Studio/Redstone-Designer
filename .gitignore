@@ -31,6 +31,12 @@
 *.out
 *.app
 
+# Drivers
+*.sys
+*.cat
+*.inf
+*.cer
+
 # Extra Items
 .vscode
 *.pdb

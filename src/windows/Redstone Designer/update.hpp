@@ -1,5 +1,5 @@
 #pragma once
 bool IsUpdateAvailable()
 {
-	return false;
+	return true;
 }

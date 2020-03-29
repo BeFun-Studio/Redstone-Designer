@@ -126,7 +126,7 @@ BEGIN
         MENUITEM "View Help Documents(&H)...",  ID_HELP_VIEWHELPDOCUMENTS
         MENUITEM "Settings(&S)...",             ID_HELP_SETTINGS
         MENUITEM SEPARATOR
-        MENUITEM "About...(&A)",                ID_HELP_ABOUT
+        MENUITEM "About(&A)...",                ID_HELP_ABOUT
     END
 END
 
@@ -194,7 +194,7 @@ BEGIN
         MENUITEM "查看帮助文档(&H)...",               ID_HELP_VIEWHELPDOCUMENTS
         MENUITEM "设置(&S)...",                   ID_HELP_SETTINGS
         MENUITEM SEPARATOR
-        MENUITEM "关于...(&A)",                   ID_HELP_ABOUT
+        MENUITEM "关于(&A)...",                   ID_HELP_ABOUT
     END
 END
 
@@ -277,7 +277,7 @@ BEGIN
     IDS_CONTINUE_AND_OPEN_EXISTING_FILE_BUTTON_TEXT_CHINESE_TRADITIONAL 
                             "打開現有檔案 >"
     IDS_CONTINUE_WITHOUT_ANY_OPERATION_BUTTON_TEXT_ENGLISH 
-                            "Continue without any operation >"
+                            "Continue without any Operation >"
     IDS_CONTINUE_WITHOUT_ANY_OPERATION_BUTTON_TEXT_CHINESE_SIMPLIFIED 
                             "不执行任何操作并继续 >"
     IDS_CONTINUE_WITHOUT_ANY_OPERATION_BUTTON_TEXT_CHINESE_TRADITIONAL 
@@ -425,7 +425,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_WARNING_WINDOW_CAPTION "Warning"
+    IDS_WARNING_WINDOW_CAPTION_ENGLISH "Warning"
     IDS_WARNING_WINDOW_CAPTION_CHINESE_SIMPLIFIED "警告"
     IDS_WARNING_WINDOW_CAPTION_CHINESE_TRADITIONAL "警告"
     IDS_INFORMATION_WINDOW_CAPTION_ENGLISH "Information"

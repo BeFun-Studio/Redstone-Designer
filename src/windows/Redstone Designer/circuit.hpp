@@ -64,10 +64,7 @@ bool ExportCircuitFile(LPCWSTR export_path)
 {
 	FILE* fp=_wfopen(export_path,L"w");
 	if (fp == NULL)
-	{
-		fclose(fp);
 		return false;
-	}
 	fwprintf(fp, L"redstonedesigner;");
 	for (int i = 0; i < CircuitLayers.size(); i++)
 	{
@@ -103,10 +100,7 @@ int ImportCircuitFile(LPCWSTR import_path)
 {
 	FILE* fp = _wfopen(import_path, L"r");
 	if (fp == NULL)
-	{
-		fclose(fp);
 		return FILE_DOES_NOT_EXISTING;
-	}
 	int current_char;
 	wstring current_string;
 	while (true)

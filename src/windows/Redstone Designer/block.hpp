@@ -42,6 +42,7 @@ public:
 			throw InvalidBlockAttributes();
 			this->transparent = true;
 		}
+
 		else
 			this->transparent = true;
 		this->type = block_type;
@@ -97,5 +98,17 @@ public:
 	Position GetPosition()
 	{
 		return this->position;
+	}
+	bool operator ==(Block& target)
+	{
+		if (target.GetBlockType() == this->type && target.GetPosition() == this->position && target.IsTransparent() == this->transparent)
+			return true;
+		return false;
+	}
+	bool operator ==(Block* target)
+	{
+		if (target->GetBlockType() == this->type && target->GetPosition() == this->position && target->IsTransparent() == this->transparent)
+			return true;
+		return false;
 	}
 };

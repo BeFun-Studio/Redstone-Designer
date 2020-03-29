@@ -125,6 +125,24 @@ public:
 	{
 		return this->direction;
 	}
+	bool operator ==(CommandBlock target)
+	{
+		if (this->comment == target.GetComment() && this->conditional == target.IsConditional() && this->custom_name == target.GetCustomName() && this->direction == target.GetDirection() && this->keep_active == target.IsKeepActive() && this->position == target.GetPosition() && this->storaged_command == target.GetCommand() && this->type == target.GetCommandBlockType())
+			return true;
+		return false;
+	}
+	bool operator ==(CommandBlock& target)
+	{
+		if (this->comment == target.GetComment() && this->conditional == target.IsConditional() && this->custom_name == target.GetCustomName() && this->direction == target.GetDirection() && this->keep_active == target.IsKeepActive() && this->position == target.GetPosition() && this->storaged_command == target.GetCommand() && this->type == target.GetCommandBlockType())
+			return true;
+		return false;
+	}
+	bool operator ==(CommandBlock* target)
+	{
+		if (this->comment == target->GetComment() && this->conditional == target->IsConditional() && this->custom_name == target->GetCustomName() && this->direction == target->GetDirection() && this->keep_active == target->IsKeepActive() && this->position == target->GetPosition() && this->storaged_command == target->GetCommand() && this->type == target->GetCommandBlockType())
+			return true;
+		return false;
+	}
 };
 class RedstoneWire :public Component
 {
@@ -137,19 +155,36 @@ public:
 	{
 		this->position = _position;
 	}
+	bool operator ==(RedstoneWire* target)
+	{
+		if (this->GetPosition() == target->GetPosition())
+			return true;
+	}
+	bool operator ==(RedstoneWire& target)
+	{
+		if (this->GetPosition() == target.GetPosition())
+			return true;
+	}
 };
-class RedstoneBlock :public Component
+class RedstoneBlock :public RedstoneWire
 {
-public:
-	RedstoneBlock()
+	bool operator ==(RedstoneBlock* target)
 	{
-		this->position = { 0,0 };
+		if (this->GetPosition() == target->GetPosition())
+			return true;
 	}
-	RedstoneBlock(Position _position)
+	bool operator ==(RedstoneBlock& target)
 	{
-		this->position = _position;
+		if (this->GetPosition() == target.GetPosition())
+			return true;
+	}
+	bool operator ==(RedstoneBlock target)
+	{
+		if (this->GetPosition() == target.GetPosition())
+			return true;
 	}
 };
+
 class RedstoneTorch :public Component
 {
 private:
@@ -160,7 +195,7 @@ public:
 		this->position = { 0,0 };
 		this->direction = UP;
 	}
-	RedstoneTorch(Position _position,Direction _direction)
+	RedstoneTorch(Position _position, Direction _direction)
 	{
 		this->position = _position;
 		this->direction = _direction;
@@ -176,7 +211,20 @@ public:
 	{
 		return this->direction;
 	}
+	bool operator ==(RedstoneTorch& target)
+	{
+		if (this->comment == target.GetComment() && this->direction == target.GetDirection() && this->position == target.GetPosition())
+			return true;
+		return false;
+	}
+	bool operator ==(RedstoneTorch* target)
+	{
+		if (this->comment == target->GetComment() && this->direction == target->GetDirection() && this->position == target->GetPosition())
+			return true;
+		return false;
+	}
 };
+
 class TrapDoor :public Component
 {
 private:
@@ -218,6 +266,18 @@ public:
 	{
 		return this->direction;
 	}
+	bool operator ==(TrapDoor& target)
+	{
+		if (this->comment == target.GetComment() && this->direction == target.GetDirection() && this->position == target.GetPosition())
+			return true;
+		return false;
+	}
+	bool operator ==(TrapDoor* target)
+	{
+		if (this->comment == target->GetComment() && this->direction == target->GetDirection() && this->position == target->GetPosition())
+			return true;
+		return false;
+	}
 };
 
 class Chest :public Component
@@ -251,8 +311,33 @@ public:
 	{
 		return this->direction;
 	}
+	bool operator ==(Chest& target)
+	{
+		if (this->comment == target.GetComment() && this->direction == target.GetDirection() && this->position == target.GetPosition())
+			return true;
+		return false;
+	}
+	bool operator ==(Chest* target)
+	{
+		if (this->comment == target->GetComment() && this->direction == target->GetDirection() && this->position == target->GetPosition())
+			return true;
+		return false;
+	}
 };
 
 class TrapChest :public Chest
 {
+public:
+	bool operator ==(TrapChest& target)
+	{
+		if (this->comment == target.GetComment() && this->direction == target.GetDirection() && this->position == target.GetPosition())
+			return true;
+		return false;
+	}
+	bool operator ==(TrapChest* target)
+	{
+		if (this->comment == target->GetComment() && this->direction == target->GetDirection() && this->position == target->GetPosition())
+			return true;
+		return false;
+	}
 };

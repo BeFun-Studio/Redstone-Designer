@@ -13,11 +13,18 @@ struct Position
 {
 	int x;
 	int y;
-};
-struct Step
-{
-	Position current_pos;
-	unsigned int step;
+	bool operator ==(Position target)
+	{
+		if (target.x == this->x && target.y == this->y)
+			return true;
+		return false;
+	}
+	bool operator ==(Position* target)
+	{
+		if (target->x == this->x && target->y == this->y)
+			return true;
+		return false;
+	}
 };
 class InvalidDirection
 {
