@@ -38,9 +38,6 @@
     <ClInclude Include="update.hpp">
       <Filter>源文件</Filter>
     </ClInclude>
-    <ClInclude Include="time_checker.hpp">
-      <Filter>源文件</Filter>
-    </ClInclude>
     <ClInclude Include="texture_loader.hpp">
       <Filter>源文件</Filter>
     </ClInclude>
@@ -56,9 +53,6 @@
     <ClInclude Include="block.hpp">
       <Filter>源文件</Filter>
     </ClInclude>
-    <ClInclude Include="asmfuncs.h">
-      <Filter>源文件</Filter>
-    </ClInclude>
     <ClInclude Include="command.hpp">
       <Filter>源文件</Filter>
     </ClInclude>
@@ -68,7 +62,13 @@
     <ClInclude Include="control.hpp">
       <Filter>源文件</Filter>
     </ClInclude>
-    <ClInclude Include="debug.hpp">
+    <ClInclude Include="time_check.hpp">
+      <Filter>源文件</Filter>
+    </ClInclude>
+    <ClInclude Include="asmfuncs.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="log.hpp">
       <Filter>源文件</Filter>
     </ClInclude>
   </ItemGroup>

@@ -11,8 +11,8 @@ enum Direction
 };
 struct Position
 {
-	int x;
-	int y;
+	signed int x;
+	signed int y;
 	bool operator ==(Position target)
 	{
 		if (target.x == this->x && target.y == this->y)

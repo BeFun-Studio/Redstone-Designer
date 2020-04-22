@@ -115,6 +115,7 @@
       </IgnoreAllDefaultLibraries>
       <OptimizeReferences>false</OptimizeReferences>
       <EnableCOMDATFolding>false</EnableCOMDATFolding>
+      <StackCommitSize>1GB</StackCommitSize>
     </Link>
     <PreBuildEvent>
       <Command>
@@ -156,6 +157,7 @@
       </IgnoreAllDefaultLibraries>
       <OptimizeReferences>false</OptimizeReferences>
       <EnableCOMDATFolding>false</EnableCOMDATFolding>
+      <StackCommitSize>1GB</StackCommitSize>
     </Link>
     <PreBuildEvent>
       <Command>
@@ -195,6 +197,7 @@
       <SupportJustMyCode>
       </SupportJustMyCode>
       <DebugInformationFormat>None</DebugInformationFormat>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -207,8 +210,7 @@
       <AdditionalOptions>/SAFESEH:NO</AdditionalOptions>
       <IgnoreSpecificDefaultLibraries>
       </IgnoreSpecificDefaultLibraries>
-      <StackCommitSize>
-      </StackCommitSize>
+      <StackCommitSize>1GB</StackCommitSize>
     </Link>
     <PreBuildEvent>
       <Command>
@@ -242,6 +244,7 @@
       <SupportJustMyCode>
       </SupportJustMyCode>
       <DebugInformationFormat>None</DebugInformationFormat>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -253,8 +256,7 @@
       <LargeAddressAware>true</LargeAddressAware>
       <IgnoreSpecificDefaultLibraries>
       </IgnoreSpecificDefaultLibraries>
-      <StackCommitSize>
-      </StackCommitSize>
+      <StackCommitSize>1GB</StackCommitSize>
     </Link>
     <PostBuildEvent>
       <Command>
@@ -294,14 +296,14 @@
     <ClInclude Include="components.hpp" />
     <ClInclude Include="control.hpp" />
     <ClInclude Include="credits.hpp" />
-    <ClInclude Include="debug.hpp" />
+    <ClInclude Include="log.hpp" />
     <ClInclude Include="def.hpp" />
     <ClInclude Include="lang.hpp" />
     <ClInclude Include="update.hpp" />
     <ClInclude Include="window.hpp" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="texture_loader.hpp" />
-    <ClInclude Include="time_checker.hpp" />
+    <ClInclude Include="time_check.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />

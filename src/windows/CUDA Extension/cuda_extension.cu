@@ -109,6 +109,62 @@ DLLAPI __device__ void CudaAddLongDouble(__global__ long double* dest, unsigned 
 	*dest = result;
 }
 
+DLLAPI __device__ void CudaAddByteList(__global__ char* dest, unsigned short count, __global__ char* lst)
+{
+	__device__ char result = 0;
+	for (__device__ unsigned short i = 0; i < count; i++)
+		result += lst[i];
+	*dest = result;
+}
+
+DLLAPI __device__ void CudaAddWordList(__global__ short* dest, unsigned short count, __global__ short* lst)
+{
+	__device__ short result = 0;
+	for (__device__ short i = 0; i < count; i++)
+		result += lst[i];
+	*dest = result;
+}
+
+DLLAPI __device__ void CudaAddDwordList(__global__ int* dest, unsigned short count, __global__ int* lst)
+{
+	__device__ int result = 0;
+	for (__device__ short i = 0; i < count; i++)
+		result += lst[i];
+	*dest = result;
+}
+
+DLLAPI __device__ void CudaAddQwordList(__global__ long long* dest, unsigned short count, __global__ long long* lst)
+{
+	__device__ long long result = 0;
+	for (__device__ short i = 0; i < count; i++)
+		result += lst[i];
+	*dest = result;
+}
+
+DLLAPI __device__ void CudaAddFloatList(__global__ float* dest, unsigned short count, __global__ float* lst)
+{
+	__device__ float result = 0;
+	for (__device__ short i = 0; i < count; i++)
+		result += lst[i];
+	*dest = result;
+}
+
+DLLAPI __device__ void CudaAddDoubleList(__global__ double* dest, unsigned short count, __global__ double* lst)
+{
+	__device__ double result = 0;
+	for (__device__ short i = 0; i < count; i++)
+		result += lst[i];
+	*dest = result;
+}
+
+DLLAPI __device__ void CudaAddLongDoubleList(__global__ long double* dest, unsigned short count, __global__ long double* lst)
+{
+	__device__ long double result = 0;
+	for (__device__ short i = 0; i < count; i++)
+		result += lst[i];
+	*dest = result;
+}
+
 DLLAPI __device__ void CudaSubtractByte(__global__ char* dest, unsigned short count, ...)
 {
 	va_list args;
@@ -176,6 +232,63 @@ DLLAPI __device__ void CudaSubtractFloat(__global__ float* dest, unsigned short 
 	__device__ float result = *dest;
 	for (unsigned short i = 0; i < count; i++)
 		result -= va_arg(args, float);
+	*dest = result;
+}
+
+
+DLLAPI __device__ void CudaSubtractByteList(__global__ char* dest, unsigned short count, __global__ char* lst)
+{
+	__device__ char result = *dest;
+	for (__device__ short i = 0; i < count; i++)
+		result -= lst[i];
+	*dest = result;
+}
+
+DLLAPI __device__ void CudaSubtractWordList(__global__ short* dest, unsigned short count, __global__ short* lst)
+{
+	__device__ short result = *dest;
+	for (__device__ short i = 0; i < count; i++)
+		result -= lst[i];
+	*dest = result;
+}
+
+DLLAPI __device__ void CudaSubtractDwordList(__global__ int* dest, unsigned short count, __global__ int* lst)
+{
+	__device__ int result = *dest;
+	for (__device__ short i = 0; i < count; i++)
+		result -= lst[i];
+	*dest = result;
+}
+
+DLLAPI __device__ void CudaSubtractQwordList(__global__ long long* dest, unsigned short count, __global__ long long* lst)
+{
+	__device__ long long result = *dest;
+	for (__device__ short i = 0; i < count; i++)
+		result -= lst[i];
+	*dest = result;
+}
+
+DLLAPI __device__ void CudaSubtractFloatList(__global__ float* dest, unsigned short count, __global__ float* lst)
+{
+	__device__ float result = *dest;
+	for (__device__ short i = 0; i < count; i++)
+		result -= lst[i];
+	*dest = result;
+}
+
+DLLAPI __device__ void CudaSubtractDoubleList(__global__ double* dest, unsigned short count, __global__ double* lst)
+{
+	__device__ double result = *dest;
+	for (__device__ short i = 0; i < count; i++)
+		result -= lst[i];
+	*dest = result;
+}
+
+DLLAPI __device__ void CudaSubtractLongDoubleList(__global__ long double* dest, unsigned short count, __global__ long double* lst)
+{
+	__device__ long double result = *dest;
+	for (__device__ short i = 0; i < count; i++)
+		result -= lst[i];
 	*dest = result;
 }
 
@@ -249,6 +362,63 @@ DLLAPI __device__ void CudaMultiplyLongDouble(__global__ long double* dest, unsi
 	*dest = result;
 }
 
+
+DLLAPI __device__ void CudaMultiplyByteList(__global__ char* dest, unsigned short count, __global__ char* lst)
+{
+	__device__ char result = lst[0];
+	for (__device__ unsigned short i = 1; i < count; i++)
+		result *= lst[i];
+	*dest = result;
+}
+
+DLLAPI __device__ void CudaMultiplyWordList(__global__ short* dest, unsigned short count, __global__ short* lst)
+{
+	__device__ short result = lst[0];
+	for (__device__ unsigned short i = 1; i < count; i++)
+		result *= lst[i];
+	*dest = result;
+}
+
+DLLAPI __device__ void CudaMultiplyDwordList(__global__ int* dest, unsigned short count, __global__ int* lst)
+{
+	__device__ int result = lst[0];
+	for (__device__ unsigned short i = 1; i < count; i++)
+		result *= lst[i];
+	*dest = result;
+}
+
+DLLAPI __device__ void CudaMultiplyQwordList(__global__ long long* dest, unsigned short count, __global__ long long* lst)
+{
+	__device__ long long result = lst[0];
+	for (__device__ unsigned short i = 1; i < count; i++)
+		result *= lst[i];
+	*dest = result;
+}
+
+DLLAPI __device__ void CudaMultiplyFloatList(__global__ float* dest, unsigned short count, __global__ float* lst)
+{
+	__device__ float result = lst[0];
+	for (__device__ unsigned short i = 1; i < count; i++)
+		result *= lst[i];
+	*dest = result;
+}
+
+DLLAPI __device__ void CudaMultiplyDoubleList(__global__ double* dest, unsigned short count, __global__ double* lst)
+{
+	__device__ double result = lst[0];
+	for (__device__ unsigned short i = 1; i < count; i++)
+		result *= lst[i];
+	*dest = result;
+}
+
+DLLAPI __device__ void CudaMultiplyLongDoubleList(__global__ long double* dest, unsigned short count, __global__ long double* lst)
+{
+	__device__ long double result = lst[0];
+	for (__device__ unsigned short i = 1; i < count; i++)
+		result *= lst[i];
+	*dest = result;
+}
+
 DLLAPI __device__ void CudaDivideByte(__global__ char* dest, unsigned short count, ...)
 {
 	va_list args;
@@ -316,6 +486,62 @@ DLLAPI __device__ void CudaDivideLongDouble(__global__ long double* dest, unsign
 	__device__ long double result = *dest;
 	for (unsigned short i = 0; i < count; i++)
 		result /= va_arg(args, long double);
+	*dest = result;
+}
+
+DLLAPI __device__ void CudaDivideByteList(__global__ char* dest, unsigned short count, __global__ char* lst)
+{
+	__device__ char result = *dest;
+	for (__device__ unsigned short i = 0; i < count; i++)
+		result *= lst[i];
+	*dest = result;
+}
+
+DLLAPI __device__ void CudaDivideWordList(__global__ short* dest, unsigned short count, __global__ short* lst)
+{
+	__device__ short result = *dest;
+	for (__device__ unsigned short i = 0; i < count; i++)
+		result *= lst[i];
+	*dest = result;
+}
+
+DLLAPI __device__ void CudaDivideDwordList(__global__ int* dest, unsigned short count, __global__ int* lst)
+{
+	__device__ int result = *dest;
+	for (__device__ unsigned short i = 0; i < count; i++)
+		result *= lst[i];
+	*dest = result;
+}
+
+DLLAPI __device__ void CudaDivideQwordList(__global__ long long* dest, unsigned short count, __global__ long long* lst)
+{
+	__device__ long long result = *dest;
+	for (__device__ unsigned short i = 0; i < count; i++)
+		result *= lst[i];
+	*dest = result;
+}
+
+DLLAPI __device__ void CudaDivideFloatList(__global__ float* dest, unsigned short count, __global__ float* lst)
+{
+	__device__ float result = *dest;
+	for (__device__ unsigned short i = 0; i < count; i++)
+		result *= lst[i];
+	*dest = result;
+}
+
+DLLAPI __device__ void CudaDivideDoubleList(__global__ double* dest, unsigned short count, __global__ double* lst)
+{
+	__device__ double result = *dest;
+	for (__device__ unsigned short i = 0; i < count; i++)
+		result *= lst[i];
+	*dest = result;
+}
+
+DLLAPI __device__ void CudaDivideLongDoubleList(__global__ long double* dest, unsigned short count, __global__ long double* lst)
+{
+	__device__ long double result = *dest;
+	for (__device__ unsigned short i = 0; i < count; i++)
+		result *= lst[i];
 	*dest = result;
 }
 

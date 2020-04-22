@@ -261,6 +261,7 @@ public:
 		if (_direction == UP || _direction == DOWN)
 			return false;
 		this->direction = _direction;
+		return true;
 	}
 	Direction GetDirection()
 	{

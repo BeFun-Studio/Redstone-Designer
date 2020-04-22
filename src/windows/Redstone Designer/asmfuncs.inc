@@ -1,6 +1,4 @@
 option casemap:none
-includelib ucrt.lib
-includelib legacy_stdio_definitions.lib
 
 .data
 cpuid_buffer db 13 dup(0)
